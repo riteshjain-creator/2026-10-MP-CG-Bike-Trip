@@ -176,9 +176,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <div class="ssep"></div>
   <div class="stat"><span class="sv">🌅 5:52pm</span><span class="sl">Sunset (Oct)</span></div>
   <div class="presets">
-    <button class="pb" onclick="applyPreset('cg')">CG Deep Dive</button>
-    <button class="pb" onclick="applyPreset('mp')">MP Highlights</button>
-    <button class="pb on" id="pb-both" onclick="applyPreset('both')">Best of Both ★</button>
+    <span class="sl" style="align-self:center;margin-right:2px">SHOW ATTRACTIONS:</span>
+    <button class="pb" onclick="applyPreset('cg')" title="Chhattisgarh focus — Gadchiroli forest, Dantewada, Chitrakote, Tirathgarh, Kotumsar, Ratanpur. Hides MP-only stops.">CG Only</button>
+    <button class="pb" onclick="applyPreset('mp')" title="Madhya Pradesh focus — Bandhavgarh, Bhedaghat, Pachmarhi, Bhimbetka, Sanchi, Ujjain, Omkareshwar, Mandu, Maheshwar. Hides CG-only stops.">MP Only</button>
+    <button class="pb on" id="pb-both" onclick="applyPreset('both')" title="All major attractions across both states — full 10-day experience (recommended)">All Attractions ★</button>
   </div>
 </div>
 
@@ -707,6 +708,7 @@ function openDD(n){
   </div>`;
 
   document.getElementById('ddcontent').innerHTML=h;
+  document.getElementById('rp').style.display='none';
   document.getElementById('dd').style.display='block';
   document.getElementById('obk').style.display='block';
   renderTimeline();
@@ -716,6 +718,7 @@ function closeDD(){
   S.openDD=null;
   document.getElementById('dd').style.display='none';
   document.getElementById('obk').style.display='none';
+  document.getElementById('rp').style.display='';
   renderTimeline();
 }
 

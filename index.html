@@ -14,7 +14,7 @@
   --bg:#12121e;--sur:#1a1a2e;--sur2:#1e2240;--sur3:#252845;
   --txt:#e0e0e0;--txt2:#8888aa;--bdr:#2a2a45;
   --ok:#2ecc71;--warn:#f39c12;--danger:#e74c3c;
-  --sh:56px;--lw:260px;--rw:330px;
+  --sh:56px;--lw:220px;--rw:330px;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   background:var(--bg);color:var(--txt);height:100vh;overflow:hidden;
@@ -25,12 +25,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   display:flex;align-items:center;padding:0 14px;gap:12px;flex-shrink:0;
   font-size:12px;overflow-x:auto;white-space:nowrap}
 #sbar .logo{font-weight:800;font-size:14px;color:#fff;letter-spacing:-0.3px}
+.ver{font-size:9px;color:var(--txt2);font-weight:400;margin-left:4px}
 .ssep{width:1px;height:28px;background:var(--bdr);flex-shrink:0}
 .stat{display:flex;flex-direction:column;align-items:center;gap:1px}
 .sv{font-size:14px;font-weight:700;color:var(--ok)}
 .sv.w{color:var(--warn)}.sv.d{color:var(--danger)}
 .sl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px}
-.presets{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+.presets{margin-left:auto;display:flex;gap:6px;flex-shrink:0;align-items:center}
 .pb{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;
   border:1px solid var(--bdr);background:transparent;color:var(--txt2);
   cursor:pointer;transition:all .2s}
@@ -51,10 +52,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .dnum{font-size:11px;font-weight:700;color:#fff}
 .ddate{font-size:10px;color:var(--txt2)}
 .dwarn{font-size:11px;margin-left:auto}
-.droute{font-size:12px;color:var(--txt);margin-bottom:1px;
+.droute{font-size:11px;color:var(--txt);margin-bottom:2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dmeta{font-size:10px;color:var(--txt2)}
+.dmeta{font-size:10px;color:var(--txt2);line-height:1.5}
 .dkm{font-weight:600}.dkm.w{color:var(--warn)}.dkm.d{color:var(--danger)}
+.dbuf{font-size:9px;font-weight:700;color:#4fc3f7;background:rgba(79,195,247,.12);
+  padding:1px 5px;border-radius:3px;margin-right:3px}
 
 /* ── MAP ── */
 #mc{flex:1;position:relative;min-width:0}
@@ -85,9 +88,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .alink{font-size:11px;color:#6aabf0;text-decoration:none;margin-left:auto}
 .alink:hover{text-decoration:underline}
 .adesc{font-size:11px;color:var(--txt2);padding-left:21px;line-height:1.45}
-.optbtn{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;
-  font-size:11px;color:var(--txt2);border-bottom:1px solid var(--bdr)}
-.optbtn:hover{background:var(--sur2)}
 
 /* ── DAY PICKER ── */
 .dpicker{position:absolute;right:12px;background:#252845;border:1px solid var(--bdr);
@@ -101,9 +101,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .dpopt.cur{outline:2px solid #fff;outline-offset:1px}
 .dpkm{font-size:9px;color:var(--txt2);margin-top:6px}
 
-/* ── OVERLAY & DAY DETAIL ── */
-#obk{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}
-#dd{position:fixed;top:var(--sh);right:0;bottom:0;width:480px;
+/* ── OVERLAY: covers map, clicking closes detail ── */
+#obk{position:fixed;top:var(--sh);left:var(--lw);right:var(--rw);bottom:0;
+  background:rgba(0,0,0,.35);z-index:200;display:none;cursor:pointer}
+
+/* ── DAY DETAIL: exactly replaces right panel ── */
+#dd{position:fixed;top:var(--sh);right:0;bottom:0;width:var(--rw);
   background:var(--sur);border-left:2px solid var(--bdr);overflow-y:auto;
   z-index:201;display:none}
 .ddhdr{padding:14px 18px;background:var(--sur2);border-bottom:1px solid var(--bdr);
@@ -115,6 +118,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .ddx:hover{color:#fff;background:var(--bdr)}
 .crit{margin:14px 18px 0;padding:11px 13px;background:rgba(243,156,18,.12);
   border-left:3px solid var(--warn);border-radius:4px}
+.bufbox{margin:14px 18px 0;padding:11px 13px;background:rgba(79,195,247,.1);
+  border-left:3px solid #4fc3f7;border-radius:4px}
+.buftitle{font-size:10px;font-weight:700;color:#4fc3f7;margin-bottom:5px;
+  text-transform:uppercase;letter-spacing:.6px}
 .crittitle{font-size:10px;font-weight:700;color:var(--warn);margin-bottom:5px;
   text-transform:uppercase;letter-spacing:.6px}
 .crittext{font-size:12px;color:var(--txt);line-height:1.6}
@@ -138,9 +145,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .ddnbtn{flex:1;padding:8px;border-radius:5px;font-size:12px;font-weight:600;
   border:1px solid var(--bdr);background:var(--sur2);color:var(--txt);cursor:pointer;text-align:center}
 .ddnbtn:hover{background:var(--sur3);color:#fff}
-.addopt{font-size:10px;padding:2px 8px;border-radius:3px;
-  background:var(--sur2);border:1px solid var(--bdr);color:var(--txt);cursor:pointer}
-.addopt:hover{background:var(--sur3)}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -164,7 +168,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 
 <!-- STATS BAR -->
 <div id="sbar">
-  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026</div>
+  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026<span class="ver">v1.3</span></div>
   <div class="ssep"></div>
   <div class="stat"><span class="sv" id="statkm">—</span><span class="sl">Total km</span></div>
   <div class="ssep"></div>
@@ -172,14 +176,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <div class="ssep"></div>
   <div class="stat"><span class="sv" id="statadd">—</span><span class="sl">Avg km/day</span></div>
   <div class="ssep"></div>
+  <div class="stat"><span class="sv" id="stathrs">—</span><span class="sl">Total ride hrs</span></div>
+  <div class="ssep"></div>
   <div class="stat"><span class="sv">Oct 11–20</span><span class="sl">Dates</span></div>
   <div class="ssep"></div>
   <div class="stat"><span class="sv">🌅 5:52pm</span><span class="sl">Sunset (Oct)</span></div>
   <div class="presets">
-    <span class="sl" style="align-self:center;margin-right:2px">SHOW ATTRACTIONS:</span>
-    <button class="pb" onclick="applyPreset('cg')" title="Chhattisgarh focus — Gadchiroli forest, Dantewada, Chitrakote, Tirathgarh, Kotumsar, Ratanpur. Hides MP-only stops.">CG Only</button>
-    <button class="pb" onclick="applyPreset('mp')" title="Madhya Pradesh focus — Bandhavgarh, Bhedaghat, Pachmarhi, Bhimbetka, Sanchi, Ujjain, Omkareshwar, Mandu, Maheshwar. Hides CG-only stops.">MP Only</button>
-    <button class="pb on" id="pb-both" onclick="applyPreset('both')" title="All major attractions across both states — full 10-day experience (recommended)">All Attractions ★</button>
+    <span class="sl" style="align-self:center;margin-right:2px">SHOW:</span>
+    <button class="pb" onclick="applyPreset('cg')" title="CG focus — Gadchiroli, Dantewada, Chitrakote, Tirathgarh, Kotumsar, Ratanpur">CG Only</button>
+    <button class="pb" onclick="applyPreset('mp')" title="MP focus — Bandhavgarh, Bhedaghat, Pachmarhi, Bhimbetka, Sanchi, Ujjain, Omkareshwar, Mandu, Maheshwar">MP Only</button>
+    <button class="pb on" onclick="applyPreset('both')" title="All major attractions across both states (recommended)">All Attractions ★</button>
   </div>
 </div>
 
@@ -190,7 +196,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   <div id="rp"><div class="ptitle">Attractions &amp; Detours</div><div id="attrlist"></div></div>
 </div>
 
-<!-- OVERLAY -->
+<!-- OVERLAY (map dimmer — click to close detail) -->
 <div id="obk" onclick="closeDD()"></div>
 <div id="dd"><div id="ddcontent"></div></div>
 
@@ -203,152 +209,213 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ═══════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════
-const DC = ['#E74C3C','#E67E22','#F39C12','#2ECC71','#1ABC9C','#3498DB','#9B59B6','#E91E63','#00BCD4','#795548'];
+const DC=['#E74C3C','#E67E22','#F39C12','#2ECC71','#1ABC9C','#3498DB','#9B59B6','#E91E63','#00BCD4','#795548'];
 
-const DAYS = [
-{n:1,date:'Oct 11 (Sun)',from:'Bangalore',to:'Nagpur',bkm:1075,night:'Nagpur',duskOk:true,warn:true,
+const DAYS=[
+{n:1,date:'Oct 11 (Sun)',from:'Bangalore',to:'Nagpur',bkm:1075,night:'Nagpur',duskOk:true,warn:true,buffer:false,
  crit:'No buffer on this 1,075km day. Hard decision point at Hyderabad (km ~570, ~3pm): if delayed by rain or breakdown, night at Hyderabad and resume Day 2 from there.\n\nBoothpur stretch after Jadcherla is patchy. Speed breakers post-Karnataka border are unmarked — hazardous at night. Do not ride past 8pm.',
  sched:[
   {t:'4:00am',n:'🚀 Depart Bangalore',s:'NH44 North. Fill tank. Leave before traffic.'},
   {t:'~7:30am',n:'Kurnool area',s:'~270km. First fuel stop. Boothpur rough stretch ahead.'},
   {t:'~11:30am',n:'⚠️ Hyderabad — Decision Point',s:'570km done. If any delay, night here. Otherwise continue.'},
-  {t:'~3:30pm',n:'🏍️ Wardha / Amravati area',s:'Push on.'},
+  {t:'~3:30pm',n:'🏍️ Wardha / Amravati area',s:'Push on. Good NH.'},
   {t:'~6:30pm',n:'🏁 Nagpur',s:'1,075km. Night halt.'},
  ],
  road:['⛽ Fuel: NH44 well-served. No dead zones.','📶 Connectivity: Good throughout.','⚠️ Boothpur stretch (Jadcherla area): rough, narrow.','🌧️ Oct: Rain possible near BLR. NH44 handles well.'],
+ food:[
+  {name:'Kurnool bypass — highway dhabas',type:'food',km:270},
+  {name:'Hyderabad — Hotel Shadab or any café (decision point)',type:'food',km:570},
+  {name:'Wardha — roadside dhaba',type:'food',km:870},
+  {name:'Nagpur — Saoji or Central India Hotel',type:'food',km:1075}
+ ],
  prebook:[]},
 
-{n:2,date:'Oct 12 (Mon)',from:'Nagpur',to:'Jagdalpur via Gadchiroli',bkm:480,night:'Jagdalpur',duskOk:true,warn:true,
- crit:'SECURITY: Chandrapur→Gadchiroli→Bijapur→Jagdalpur crosses historically Naxal-affected Bijapur district (CG). Verify ground conditions in September 2026 before committing.\n\nCONTINGENCY: If advisory active, use Nagpur→Raipur (NH53, 290km)→Kanker→Jagdalpur (310km) = 600km. Accept Kanker↔Jagdalpur repeat on exit leg.\n\nFUEL: Last reliable fuel at Chandrapur. ~300km gap to Jagdalpur. Carry fuel can. Fill to brim at Chandrapur.',
+{n:2,date:'Oct 12 (Mon)',from:'Nagpur',to:'Jagdalpur via Gadchiroli',bkm:480,night:'Jagdalpur',duskOk:true,warn:true,buffer:false,
+ crit:'SECURITY: Chandrapur→Gadchiroli→Bijapur→Jagdalpur crosses historically Naxal-affected Bijapur district (CG). Verify ground conditions in September 2026 before committing.\n\nCONTINGENCY: If advisory active, use Nagpur→Raipur (NH53, 290km)→Kanker→Jagdalpur (310km) = 600km.\n\nFUEL: Last reliable fuel at Chandrapur. ~300km gap to Jagdalpur. Carry fuel can. Fill to brim at Chandrapur.',
  sched:[
   {t:'7:00am',n:'🚀 Depart Nagpur',s:''},
   {t:'~9:00am',n:'⛽ Chandrapur',s:'150km. FILL FUEL + CARRY CAN. Last reliable fuel for 300km.'},
   {t:'~11:30am',n:'Gadchiroli',s:'150km from Chandrapur. Enter tribal forest corridor. No signal.'},
   {t:'~1:00pm',n:'🏍️ Bhamragad → Bijapur CG',s:'Dense forest. No signal. Slow state roads.'},
-  {t:'~5:30pm',n:'🏁 Jagdalpur',s:'~480km. 3 nights here.'},
+  {t:'~5:30pm',n:'🏁 Jagdalpur',s:'~480km. 2 nights here.'},
  ],
  road:['⛽ CARRY FUEL CAN. Fill at Chandrapur. ~300km gap.','📵 No signal from Gadchiroli onward. Download offline maps before Day 1.','⚠️ Bijapur district: verify security Sep 2026.','🌿 Highlight: Dense tribal forest, Indravati River, raw roads.'],
- prebook:[]},
-
-{n:3,date:'Oct 13 (Tue)',from:'Jagdalpur',to:'Dantewada + back',bkm:170,night:'Jagdalpur',duskOk:true,warn:false,
- crit:null,
- sched:[
-  {t:'8:00am',n:'🚀 Depart Jagdalpur',s:'85km south on NH30 to Dantewada.'},
-  {t:'~9:30am',n:'🛕 Danteshwari Temple, Dantewada',s:'14th-century Shakti Peetha. Check access protocol for non-tribal visitors during Dussehra festival season.'},
-  {t:'~11:30am',n:'🏍️ Return to Jagdalpur',s:'85km back north.'},
-  {t:'~1:00pm',n:'Jagdalpur town',s:'Bastar Palace, Anthropological Museum, tribal craft market.'},
-  {t:'Evening',n:'🎪 Bastar Dussehra atmosphere',s:'Pre-festival processions, tribal drumming and street markets.'},
+ food:[
+  {name:'Nagpur — fill breakfast before departure',type:'food',km:0},
+  {name:'Chandrapur — last proper town food',type:'food',km:150},
+  {name:'CARRY PACKED FOOD — no reliable stops Gadchiroli→Jagdalpur',type:'note',km:200},
+  {name:'Jagdalpur — Bastar Café or hotel restaurant',type:'food',km:480}
  ],
- road:['⛽ Fuel: Jagdalpur city.','📶 Weak signal in Dantewada surrounds.','ℹ️ Dantewada: travel during daylight only.','🎭 Check which Dussehra rituals are scheduled this date.'],
  prebook:[]},
 
-{n:4,date:'Oct 14 (Wed)',from:'Jagdalpur',to:'Circular day rides',bkm:150,night:'Jagdalpur',duskOk:true,warn:false,
+{n:3,date:'Oct 13 (Tue)',from:'Jagdalpur',to:'Dantewada + Tirathgarh + Kotumsar',bkm:300,night:'Jagdalpur',duskOk:true,warn:false,buffer:false,
+ crit:'COMBINED DAY: Both the south loop (Dantewada, 85km each way) and east loop (Tirathgarh+Kotumsar, 65km each way) are in one day.\n\nStart by 7am sharp. Keep Dantewada to 1.5hrs max — back to Jagdalpur by noon. Then east into Kanger Valley.\n\nKOTUMSAR: Guide + permit at gate. First-come basis. No signal inside Kanger Valley. Carry water and snacks for east loop.',
+ sched:[
+  {t:'7:00am',n:'🚀 Depart Jagdalpur south',s:'85km on NH30 to Dantewada.'},
+  {t:'~9:15am',n:'🛕 Danteshwari Temple, Dantewada',s:'14th-century Shakti Peetha. Patron deity of Bastar royals. One of 52 Shakti shrines in India. 1.5hrs.'},
+  {t:'~11:00am',n:'🚀 Return to Jagdalpur',s:'85km north.'},
+  {t:'~12:30pm',n:'⛽ Jagdalpur — fuel + quick lunch',s:'Refuel. Quick meal. Now heading east.'},
+  {t:'~1:30pm',n:'🌊 Tirathgarh Falls',s:'65km east. Tiered 91m plunge on Kanger River. Crystal-clear water. Dense forest. 1.5hrs.'},
+  {t:'~3:00pm',n:'🕳️ Kotumsar Caves',s:'Near Tirathgarh. Guide at gate. Underground river, stalactites, rare blind fish. 2hrs.'},
+  {t:'~6:00pm',n:'🏁 Back to Jagdalpur',s:'65km return.'},
+ ],
+ road:['⛽ Fuel at Jagdalpur midday. Carry water for Kanger loop.','📵 No signal in Kanger Valley. Download offline maps.','🎫 Kotumsar: guide ticket at gate. Bring torch.','⚠️ If time is tight, Kotumsar can be dropped — Tirathgarh is the highlight.'],
+ food:[
+  {name:'Bastar Café, Jagdalpur — early breakfast',type:'food',km:0},
+  {name:'Tea stalls near Danteshwari Temple',type:'food',km:85},
+  {name:'Highway dhaba, Jagdalpur (NH30 junction)',type:'food',km:170},
+  {name:'CARRY SNACKS — no vendors inside Kanger Valley',type:'note',km:240}
+ ],
+ prebook:[{n:'Kotumsar Caves guide',s:'Paid at gate day-of. First-come.',u:null,r:false}]},
+
+{n:4,date:'Oct 14 (Wed)',from:'Jagdalpur',to:'Kanker via Chitrakote',bkm:240,night:'Kanker ❤️',duskOk:true,warn:false,buffer:false,
  crit:null,
  sched:[
   {t:'7:30am',n:'🚀 → Chitrakote Falls',s:'38km west. Fork off NH30.'},
-  {t:'~8:30am',n:'💧 Chitrakote Falls',s:"India's widest waterfall — 300m horseshoe on the Indravati. Peak October flow. Parvati Caves on left bank. 2hrs."},
-  {t:'~11:00am',n:'🏍️ Return to Jagdalpur → East',s:'38km back, then 65km east into Kanger Valley.'},
-  {t:'~1:00pm',n:'🌊 Tirathgarh Falls',s:'Tiered 91m plunge on Kanger River. Crystal-clear water. Dense forest. 1.5hrs.'},
-  {t:'~2:30pm',n:'🕳️ Kotumsar Caves',s:'Near Tirathgarh. Guide required + permit at gate. One of India\'s longest cave systems — stalactites, underground river. 2hrs.'},
-  {t:'~5:30pm',n:'🏁 Jagdalpur',s:'65km return.'},
+  {t:'~8:30am',n:'💧 Chitrakote Falls',s:"India's widest waterfall — 300m horseshoe on the Indravati. Peak October post-monsoon flow. Parvati Caves on left bank. 2hrs."},
+  {t:'~11:00am',n:'🚀 Return to Jagdalpur',s:'38km east. Fuel + quick lunch.'},
+  {t:'~12:30pm',n:'🚀 Depart north to Kanker',s:'160km via Kondagaon.'},
+  {t:'~1:30pm',n:'Kondagaon (en route)',s:'56km north. Check for weekly tribal haat market. If market day, stop 30 mins.'},
+  {t:'~3:30pm',n:'❤️ Kanker',s:'160km from Jagdalpur. Arrive mid-afternoon. Full evening free.'},
+  {t:'Evening',n:'Kanker town explore',s:'Walk familiar streets. Kanker Palace. Dudh River. Fort. Local market.'},
  ],
- road:['⛽ Fuel: Jagdalpur. No issues on day rides.','📵 Kanger Valley: no signal.','🎫 Kotumsar: guide + entry permit at gate. Bring torch.','🌿 Kanger road: beautiful forest ride, well-maintained.'],
- prebook:[{n:'Kotumsar Caves guide',s:'Paid at gate day-of',u:null,r:false}]},
-
-{n:5,date:'Oct 15 (Thu)',from:'Jagdalpur',to:'Kanker',bkm:160,night:'Kanker ❤️',duskOk:true,warn:false,
- crit:null,
- sched:[
-  {t:'9:00am',n:'🚀 Depart Jagdalpur',s:'Short day by design.'},
-  {t:'~10:00am',n:'Kondagaon (en route)',s:'56km. Check for weekly tribal haat market — if market day, worth 30 mins.'},
-  {t:'~12:30pm',n:'❤️ Kanker',s:'160km. Arrive early. Full afternoon free.'},
-  {t:'Afternoon',n:'Kanker town',s:'Walk the streets. School visit. Kanker Palace. Dudh River. Local fort and temples.'},
+ road:['⛽ Fill at Jagdalpur before heading north. No fuel issues on this leg.','📶 Good connectivity throughout.','❤️ Arrive early — walk the town in golden hour.','ℹ️ Kondagaon tribal haat: check weekly market calendar before leaving.'],
+ food:[
+  {name:'Tea stalls at Chitrakote falls viewpoint',type:'food',km:38},
+  {name:'Quick dhaba, Jagdalpur (NH30)',type:'food',km:76},
+  {name:'Kondagaon — roadside dhabas',type:'food',km:130},
+  {name:'Kanker Palace restaurant or local eateries',type:'food',km:240}
  ],
- road:['⛽ Fuel: Jagdalpur or Kondagaon.','📶 Moderate connectivity.','❤️ Personal day — short and easy.','ℹ️ Kondagaon tribal haat: check weekly market day calendar.'],
  prebook:[{n:'Kanker accommodation',s:'Kanker Palace heritage hotel or CG Tourism rest house',u:'https://www.chhattisgarhtourism.co.in',r:true}]},
 
-{n:6,date:'Oct 16 (Fri)',from:'Kanker',to:'Amarkantak',bkm:515,night:'Amarkantak',duskOk:false,warn:true,
- crit:'KM CORRECTION: This day is ~515km (not 400km). With Ratanpur detour it is at the upper limit of an attraction day.\n\nDARKNESS: Final 50km to Amarkantak is a ghat climb. DO NOT arrive after dark. Leave Kanker by 7:00am sharp.\n\nMORNING: 280km of highway (Kanker→Raipur→Bilaspur) before the forest begins at Achanakmar. Functional, not scenic, until Bilaspur.',
+{n:5,date:'Oct 15 (Thu)',from:'Kanker',to:'Kanker — Buffer Day',bkm:20,night:'Kanker ❤️',duskOk:true,warn:false,buffer:true,
+ crit:'BUFFER DAY: Built into the plan deliberately. If any of Days 2–4 went wrong (rain, breakdown, Gadchiroli reroute, illness), use today to recover. If all is well, it is a pure personal day — school, streets, people.\n\nDO NOT try to push on to Amarkantak today. Day 6 is the hardest riding day (515km) and requires a 7am start on fresh legs.',
+ sched:[
+  {t:'Morning',n:'❤️ Old Kanker streets',s:'Walk the familiar routes. School campus. Childhood landmarks.'},
+  {t:'~10:00am',n:'🏛️ Kanker Palace',s:'19th-century heritage hotel. Wood and stone architecture. Small museum inside.'},
+  {t:'~12:00pm',n:'🌊 Dudh River',s:'Walk the river banks. Quiet and green. Good for photos.'},
+  {t:'~2:00pm',n:'🏯 Kanker Hill Fort',s:'Short climb. Panoramic view over town and surrounding forest.'},
+  {t:'~4:00pm',n:'🛕 Local temples + market',s:'Evening market. Street food. Tribal craft stalls from surrounding villages.'},
+  {t:'Evening',n:'⛽ Fuel the Tiger + early rest',s:'Fill tank tonight. 7am sharp departure tomorrow for 515km Amarkantak run.'},
+ ],
+ road:['⛽ FILL FUEL TONIGHT — 7am sharp departure tomorrow.','🔧 Bike check: tyres, chain, oil. Prep for 515km tomorrow.','🔵 BUFFER: If recovering from earlier setback, use the full day. No guilt.','📶 Good connectivity in town.'],
+ food:[
+  {name:'Kanker Palace restaurant — sit-down meal',type:'food',km:0},
+  {name:'Local dhabas on main market road',type:'food',km:0},
+  {name:'Evening street food at tribal market',type:'food',km:0}
+ ],
+ prebook:[]},
+
+{n:6,date:'Oct 16 (Fri)',from:'Kanker',to:'Amarkantak',bkm:515,night:'Amarkantak',duskOk:false,warn:true,buffer:false,
+ crit:'KM REALITY: This day is ~515km — the longest attraction day on the trip.\n\nDARKNESS: Final 50km to Amarkantak is a ghat climb. DO NOT arrive after dark. Leave Kanker at 7:00am sharp. No exceptions.\n\nMORNING: 280km of highway (Kanker→Raipur→Bilaspur) before forest begins. Functional riding, not scenic, until Bilaspur.',
  sched:[
   {t:'7:00am',n:'🚀 Depart Kanker',s:'⚠️ Must leave by 7am to reach Amarkantak before dark.'},
   {t:'~9:30am',n:'Raipur',s:'150km. Pass through. NH30.'},
   {t:'~11:00am',n:'⛽ Bilaspur — FILL FUEL',s:'130km from Raipur. Last reliable fuel for 185km.'},
-  {t:'~11:30am',n:'🛕 Ratanpur detour',s:'25km off Bilaspur. Mahamaya Temple — 11th-c Kalachuri architecture, one of CG\'s most important Shakti shrines. 45min. Return 25km to highway.'},
-  {t:'~1:00pm',n:'🌿 Achanakmar corridor',s:'Enter Achanakmar Tiger Reserve buffer. Part of Achanakmar-Amarkantak Biosphere. Slow down. Elephant corridor. No signal.'},
-  {t:'~3:30pm',n:'🏁 Amarkantak',s:'~515km. 🌅 Sunset 5:52pm — 2.5hrs daylight on arrival. Check in to MPTDC bungalow.'},
+  {t:'~11:30am',n:'🛕 Ratanpur detour',s:"25km off Bilaspur. Mahamaya Temple — 11th-c Kalachuri architecture, one of CG's most important Shakti shrines. 45min. Return 25km."},
+  {t:'~1:00pm',n:'🌿 Achanakmar corridor',s:'Enter Achanakmar Tiger Reserve buffer. Elephant corridor. Slow down. No signal.'},
+  {t:'~3:30pm',n:'🏁 Amarkantak',s:'~515km. Sunset 5:52pm — 2.5hrs daylight. Check into MPTDC bungalow.'},
  ],
  road:['⛽ Fill at Bilaspur. 185km gap to Amarkantak.','📵 No signal from Achanakmar onward.','⚠️ Amarkantak ghat last 50km — winding. No night riding.','🛣️ Kanker→Bilaspur: good NH. Bilaspur→Amarkantak: state road, manageable.'],
+ food:[
+  {name:'Raipur — highway restaurants near bypass',type:'food',km:150},
+  {name:'Bilaspur — eat before Ratanpur detour',type:'food',km:280},
+  {name:'CARRY SNACKS — no food from Achanakmar onward',type:'note',km:350},
+  {name:'Amarkantak — MPTDC bungalow canteen (limited menu)',type:'food',km:515}
+ ],
  prebook:[{n:'Amarkantak MPTDC Bungalow',s:'Book ahead — limited rooms',u:'https://www.mptourism.com',r:true}]},
 
-{n:7,date:'Oct 17 (Sat)',from:'Amarkantak',to:'Bandhavgarh',bkm:230,night:'Bandhavgarh',duskOk:true,warn:false,
+{n:7,date:'Oct 17 (Sat)',from:'Amarkantak',to:'Bandhavgarh',bkm:230,night:'Bandhavgarh',duskOk:true,warn:false,buffer:false,
  crit:null,
  sched:[
   {t:'6:00am',n:'🕉️ Narmada Udgam',s:'Source of the Narmada. Ancient temple complex at 1,048m. Cool morning air.'},
-  {t:'~7:30am',n:'💧 Kapildhara Falls',s:"Narmada's first major drop — 100ft. 3km walk or viewpoint drive. 45min."},
+  {t:'~7:30am',n:'💧 Kapildhara Falls',s:"Narmada's first major drop — 100ft plunge. 3km walk or viewpoint drive. 45min."},
   {t:'~8:30am',n:'Dudh Dhara + Sone Muda',s:'Milky cascade. Source of Son River also here — two great rivers born at Amarkantak. 30min.'},
   {t:'~9:30am',n:'🚀 Depart Amarkantak',s:''},
   {t:'~10:30am',n:'🏍️ Anuppur → Shahdol',s:'⛽ Fill fuel at Shahdol.'},
   {t:'~1:30pm',n:'🏁 Bandhavgarh',s:'~230km. Arrive afternoon. Confirm safari booking. Rest.'},
  ],
  road:['⛽ Fill at Shahdol (~130km from Amarkantak).','📶 Signal weak Amarkantak, improves from Anuppur.','🏨 Stay near Tala Gate for 6am safari access tomorrow.','🎫 Confirm Tala Zone safari booking today.'],
+ food:[
+  {name:'Amarkantak — MPTDC canteen or prasad near temples',type:'food',km:0},
+  {name:'Shahdol — restaurants near fuel station',type:'food',km:130},
+  {name:'Bandhavgarh — resort/lodge restaurant',type:'food',km:230}
+ ],
  prebook:[
   {n:'Bandhavgarh Tala Zone Safari',s:'Oct 18, 6am — book 4–6 weeks ahead',u:'https://mponline.gov.in',r:true},
   {n:'Bandhavgarh buffer lodge',s:'Must be walking distance to Tala gate',u:null,r:true}]},
 
-{n:8,date:'Oct 18 (Sun)',from:'Bandhavgarh',to:'Pachmarhi',bkm:420,night:'Pachmarhi',duskOk:true,warn:true,
- crit:'ZERO SLACK: Safari 6am–10am + 420km + Bhedaghat = 12-hour day with no margin.\n\nBHEDAGHAT HARD CAP: 2 hours maximum. Depart by 3:15pm regardless. The marble gorge at evening light is very compelling — leave anyway.\n\nCONTINGENCY: If safari runs long or delayed, night at Jabalpur (after Bhedaghat). Pachmarhi is a short 2hr hop on Day 9 morning.',
+{n:8,date:'Oct 18 (Sun)',from:'Bandhavgarh',to:'Pachmarhi',bkm:420,night:'Pachmarhi',duskOk:true,warn:true,buffer:false,
+ crit:'ZERO SLACK: Safari 6am–10am + 420km + Bhedaghat = 12-hour day with no margin.\n\nBHEDAGHAT HARD CAP: 2 hours maximum. Depart by 3:15pm regardless — the marble gorge at evening light is very compelling, leave anyway.\n\nCONTINGENCY: If safari runs long or delayed, night at Jabalpur (after Bhedaghat). Pachmarhi is a short 2hr hop on Day 9 morning.',
  sched:[
   {t:'5:30am',n:'🚀 Tala Gate',s:'Be at gate 15min early.'},
   {t:'6:00am',n:'🐯 Bandhavgarh Safari',s:'Tala Zone. Highest tiger density in India. Ancient Bandhavgarh Fort (rock-cut caves, 2,000yrs old) visible inside park. 4hrs.'},
   {t:'10:15am',n:'🚀 Depart Bandhavgarh',s:''},
   {t:'~12:45pm',n:'⛽ Jabalpur',s:'195km. Fill fuel.'},
-  {t:'~1:15pm',n:'🏛️ Bhedaghat / Marble Rocks',s:'22km from Jabalpur. Narmada cuts 100ft white marble gorge. Boat ride through canyon. Dhuandhar Falls ("Smoke Cascade"). ⏰ HARD DEPART 3:15pm.'},
+  {t:'~1:15pm',n:'🏛️ Bhedaghat / Marble Rocks',s:'22km from Jabalpur. Narmada cuts 100ft white marble gorge. Boat ride. Dhuandhar Falls. ⏰ HARD DEPART 3:15pm.'},
   {t:'3:15pm',n:'🚀 Depart Bhedaghat',s:'Hard cap. → Pipariya → Pachmarhi ghat.'},
   {t:'~4:00pm',n:'⛽ Pipariya',s:'Top up fuel. Start ghat climb.'},
   {t:'~6:15pm',n:'🏁 Pachmarhi',s:'195km via Satpura ghat. MPTDC bungalow.'},
  ],
  road:['⛽ Jabalpur (fill). Top up Pipariya before ghat.','📶 Good signal Jabalpur. Weak in Pachmarhi.','🏔️ Pipariya→Pachmarhi ghat: 55km switchbacks through sal forest. Allow 1hr.','⚠️ Confirm MPTDC Pachmarhi reservation.'],
+ food:[
+  {name:'Bandhavgarh — resort breakfast before 5:30am safari dep',type:'food',km:0},
+  {name:'Jabalpur — Kalchuri restaurant or city market dhabas',type:'food',km:195},
+  {name:'Bhedaghat — chai and snacks at marble rock viewpoint',type:'food',km:217},
+  {name:'Pipariya — quick meal before ghat climb',type:'food',km:390},
+  {name:'Pachmarhi — MPTDC bungalow dinner',type:'food',km:420}
+ ],
  prebook:[{n:'Pachmarhi MPTDC Bungalow',s:'Book at mptourism.com',u:'https://www.mptourism.com',r:true}]},
 
-{n:9,date:'Oct 19 (Mon)',from:'Pachmarhi',to:'Ujjain',bkm:500,night:'Ujjain',duskOk:true,warn:true,
- crit:'LEAVE EARLY: Depart Pachmarhi by 7am. Day has 500km + 3 proper stops.\n\nSEQUENCING: Bhimbetka is 45km BEFORE Bhopal coming from Pachmarhi (south on NH46). Correct order: Pachmarhi → Bhimbetka → Bhopal → Sanchi → Ujjain.\n\nBHOJPUR DROPPED: Too much for this day. Bhojpur (unfinished Shiva temple, 28km SW of Bhopal) is an optional detour — toggle it in the app if you want to add it.',
+{n:9,date:'Oct 19 (Mon)',from:'Pachmarhi',to:'Ujjain',bkm:500,night:'Ujjain',duskOk:true,warn:true,buffer:false,
+ crit:'LEAVE EARLY: Depart Pachmarhi by 7am. Day has 500km + 3 proper stops.\n\nSEQUENCING: Bhimbetka is 45km BEFORE Bhopal on NH46 coming from Pachmarhi. Correct order: Pachmarhi → Bhimbetka → Bhopal → Sanchi → Ujjain.\n\nBHOJPUR: Optional 28km detour SW of Bhopal (toggle in app). Largest Shivalinga in India — 30min stop. Only add if Pachmarhi departure was before 7am.',
  sched:[
   {t:'7:00am',n:'🚀 Depart Pachmarhi',s:'Leave early. Long day.'},
-  {t:'~9:30am',n:'🏛️ Bhimbetka Rock Shelters',s:'190km via Hoshangabad. On NH46 before Bhopal — free on-route stop. UNESCO. 30,000-year-old rock paintings in 750+ shelters. 1.5hrs.'},
+  {t:'~9:30am',n:'🏛️ Bhimbetka Rock Shelters',s:'190km via Hoshangabad. On NH46 before Bhopal — free on-route stop. UNESCO. 30,000-year-old rock paintings. 1.5hrs.'},
   {t:'~11:00am',n:'⛽ Bhopal',s:'45km from Bhimbetka. Pass through. Fill fuel.'},
-  {t:'~11:45am',n:'🕌 Sanchi Stupa',s:'45km NE of Bhopal. Oldest stone structure in India (3rd century BCE, Emperor Ashoka). Carved toranas are finest Buddhist sculpture in the world. UNESCO. 2hrs.'},
+  {t:'~11:45am',n:'🕌 Sanchi Stupa',s:'45km NE of Bhopal. Oldest stone structure in India (3rd c. BCE, Ashoka). UNESCO. Carved toranas — finest Buddhist sculpture. 2hrs.'},
   {t:'~2:00pm',n:'🚀 Depart Sanchi → Ujjain',s:'220km, ~3hrs.'},
-  {t:'~5:00pm',n:'🏁 Ujjain',s:'Night halt. Tomorrow: Dussehra Bhasma Aarti at 4am.'},
+  {t:'~5:00pm',n:'🏁 Ujjain',s:'Night halt. Bhasma Aarti at 4am tomorrow — set alarm.'},
  ],
- road:['⛽ Bhopal (fill before Sanchi leg).','📶 Good throughout.','🛣️ Bhopal→Sanchi→Ujjain: northward dog-leg (+90km vs direct). Worth it for Sanchi.','ℹ️ Optional: Bhojpur Temple (+56km from Bhopal, 30min stop) — toggle in app.'],
+ road:['⛽ Bhopal (fill before Sanchi leg).','📶 Good throughout.','🛣️ Bhopal→Sanchi→Ujjain: +90km dog-leg vs direct. Worth it for Sanchi.','ℹ️ Bhojpur Temple: +56km from Bhopal, 30min stop — toggle in app.'],
+ food:[
+  {name:'Hoshangabad / Narmadapuram — highway dhabas',type:'food',km:100},
+  {name:'Bhopal — eat before Sanchi leg (many options)',type:'food',km:235},
+  {name:'Sanchi — basic canteen near site entrance',type:'food',km:280},
+  {name:'Ujjain — dhabas near Mahakaleshwar or city market',type:'food',km:500}
+ ],
  prebook:[{n:'Mahakaleshwar Bhasma Aarti slot',s:'Oct 20, 4am — book at shrimahakaleshwar.com',u:'https://www.shrimahakaleshwar.com',r:true}]},
 
-{n:10,date:'Oct 20 (Tue) — DUSSEHRA 🎆',from:'Ujjain',to:'Indore',bkm:315,night:'Indore ✈️',duskOk:true,warn:true,
- crit:'BHASMA AARTI: Requires advance slot booking at Mahakaleshwar devasthan trust portal. Walk-in darshan is possible but the aarti close-up needs a pre-booked slot. Treat this as mandatory — same priority as Bandhavgarh safari.\n\nFLIGHT: Arrive Indore by ~3pm. Book evening flight (6pm+) from IDR to BLR. Confirm bike handover to trusted garage before flying.',
+{n:10,date:'Oct 20 (Tue) — DUSSEHRA 🎆',from:'Ujjain',to:'Indore',bkm:315,night:'Indore ✈️',duskOk:true,warn:true,buffer:true,
+ crit:'BHASMA AARTI: Requires advance slot booking. Walk-in darshan possible but aarti close-up needs pre-booked slot. Treat as mandatory — same priority as Bandhavgarh safari.\n\nBUFFER LOGIC: If Day 9 overran (Sanchi skipped, arrived Ujjain late), aarti is still doable. If aarti missed, go direct Ujjain→Indore (130km, arrive 8am). Fly evening regardless — plenty of time.\n\nFLIGHT: Book evening flight (6pm+) from IDR. Confirm bike handover to trusted garage before flying.',
  sched:[
   {t:'3:30am',n:'🛕 Mahakaleshwar Temple',s:'Pre-booked Bhasma Aarti slot. Cremation ash anointed on deity. DUSSEHRA morning. Unique in India.'},
   {t:'~6:00am',n:'🚀 Depart Ujjain',s:'Leisurely final day. 315km with 4 stops.'},
-  {t:'~8:00am',n:'🕉️ Omkareshwar',s:'130km. OM-shaped island in the Narmada. Jyotirlinga. Winding descent to riverbank. Boat or bridge to island temple. 2hrs.'},
-  {t:'~10:30am',n:'🏰 Mandu',s:'60km. Medieval plateau ruins. Jahaz Mahal flanked by two lakes. Rani Roopmati\'s hilltop pavilion. Ride between monuments. 2hrs.'},
-  {t:'~1:00pm',n:'⛵ Maheshwar',s:'35km. Ahilya Fort on Narmada. Stone ghats, Holkar court. Active silk weavers inside fort. 1.5hrs.'},
-  {t:'~3:00pm',n:'🏁 Indore',s:'90km. Drop bike. Fly home. 🎉'},
+  {t:'~8:00am',n:'🕉️ Omkareshwar',s:'130km. OM-shaped island in Narmada. Jyotirlinga. Winding descent to riverbank. 2hrs.'},
+  {t:'~10:30am',n:'🏰 Mandu',s:"60km. Medieval plateau fort-city. Jahaz Mahal, Rani Roopmati's pavilion. Ride between monuments. 2hrs."},
+  {t:'~1:00pm',n:'⛵ Maheshwar',s:'35km. Ahilya Fort on Narmada. Stone ghats, Holkar court. Silk weavers inside fort. 1.5hrs.'},
+  {t:'~3:00pm',n:'🏁 Indore',s:'90km. Drop bike. Rajwada if time. Fly home. 🎉'},
  ],
  road:['⛽ Ujjain (fill). No dead zones on this leg.','📶 Good throughout.','✈️ Indore airport (IDR): ~12km from city. Evening BLR flights.','🔧 Bike: Arrange trusted Triumph-capable garage handover before arriving.'],
+ food:[
+  {name:'Prasad near Mahakaleshwar — 4am, no food needed yet',type:'note',km:0},
+  {name:'Omkareshwar — chai and prasad at ghats',type:'food',km:130},
+  {name:'Mandu — NO restaurants inside ruins; carry snacks',type:'note',km:190},
+  {name:'Maheshwar — Ahilya Fort café (rooftop Narmada view)',type:'food',km:225},
+  {name:'Indore — Sarafa night market or 56 Dukan if time allows',type:'food',km:315}
+ ],
  prebook:[
   {n:'Bhasma Aarti slot — Mahakaleshwar',s:'Oct 20, 4am — MANDATORY',u:'https://www.shrimahakaleshwar.com',r:true},
   {n:'Indore bike storage / garage',s:'Arrange trusted Triumph-capable mechanic',u:null,r:true},
   {n:'Indore→Bangalore flight (IDR→BLR)',s:'Book evening Oct 20',u:'https://www.makemytrip.com',r:false}]}
 ];
 
-// ROUTE POLYLINES per day
-const ROUTES = [
+const ROUTES=[
   [[12.97,77.59],[13.34,77.10],[14.23,76.40],[15.14,76.93],[15.83,78.04],[17.38,78.49],[18.67,78.09],[19.15,77.32],[20.93,77.75],[21.15,79.09]],
   [[21.15,79.09],[20.75,78.60],[19.96,79.30],[20.10,80.01],[18.96,80.03],[18.84,80.79],[19.07,82.03]],
-  [[19.07,82.03],[18.90,81.35],[19.07,82.03]],
-  [[19.07,82.03],[19.11,81.69],[19.14,82.03],[19.14,81.94],[19.12,81.98],[19.07,82.03]],
-  [[19.07,82.03],[19.59,81.66],[20.28,81.49]],
+  [[19.07,82.03],[18.90,81.35],[19.07,82.03],[19.14,81.94],[19.12,81.98],[19.07,82.03]],
+  [[19.07,82.03],[19.11,81.69],[19.07,82.03],[19.59,81.66],[20.28,81.49]],
+  [[20.28,81.49],[20.28,81.49]],
   [[20.28,81.49],[21.25,81.63],[22.08,82.14],[22.29,82.15],[22.08,82.14],[22.39,81.89],[22.67,81.76]],
   [[22.67,81.76],[23.10,81.68],[23.30,81.36],[23.53,80.84],[23.72,80.98]],
   [[23.72,80.98],[23.83,80.40],[23.18,79.99],[23.15,79.81],[22.77,78.35],[22.47,78.43]],
@@ -356,131 +423,100 @@ const ROUTES = [
   [[23.18,75.77],[22.75,75.90],[22.25,76.15],[22.36,75.40],[22.18,75.59],[22.72,75.86]]
 ];
 
-// ATTRACTIONS
-const ATTRS = [
-  {id:'gadchiroli',name:'Gadchiroli Forest Corridor',d:2,t:1,dkm:0,vh:0,
-   lat:20.10,lng:80.01,opt:false,
+const ATTRS=[
+  {id:'gadchiroli',name:'Gadchiroli Forest Corridor',d:2,t:1,dkm:0,vh:0,lat:20.10,lng:80.01,
    desc:'Dense tribal forests, Indravati corridor. Raw adventure entry into Bastar region.',
    link:'https://en.wikipedia.org/wiki/Gadchiroli_district'},
-  {id:'dantewada',name:'Danteshwari Temple, Dantewada',d:3,t:1,dkm:85,vh:1.5,
-   lat:18.90,lng:81.35,opt:false,
+  {id:'dantewada',name:'Danteshwari Temple, Dantewada',d:3,t:1,dkm:85,vh:1.5,lat:18.90,lng:81.35,
    desc:'14th-century Shakti Peetha — one of 52 most sacred goddess temples in India. Ancient Bastar royal patronage.',
    link:'https://en.wikipedia.org/wiki/Danteshwari_Temple'},
-  {id:'chitrakote',name:'Chitrakote Falls',d:4,t:1,dkm:38,vh:2,
-   lat:19.11,lng:81.69,opt:false,
-   desc:"India's widest waterfall — 300m horseshoe on the Indravati. Peak October post-monsoon flow.",
-   link:'https://en.wikipedia.org/wiki/Chitrakote_Falls'},
-  {id:'tirathgarh',name:'Tirathgarh Falls',d:4,t:1,dkm:65,vh:1.5,
-   lat:19.14,lng:81.94,opt:false,
+  {id:'tirathgarh',name:'Tirathgarh Falls',d:3,t:1,dkm:65,vh:1.5,lat:19.14,lng:81.94,
    desc:'Tiered 91m plunge in Kanger Valley NP. Crystal-clear Kanger River. Stunning forest setting.',
    link:'https://en.wikipedia.org/wiki/Tirathgarh_Falls'},
-  {id:'kotumsar',name:'Kotumsar Caves',d:4,t:1,dkm:0,vh:2,
-   lat:19.12,lng:81.98,opt:false,
+  {id:'kotumsar',name:'Kotumsar Caves',d:3,t:1,dkm:0,vh:2,lat:19.12,lng:81.98,
    desc:"One of India's longest cave systems. Stalactites, underground river. Near Tirathgarh. Guide required.",
    link:'https://en.wikipedia.org/wiki/Kotumsar_Cave'},
-  {id:'ratanpur',name:'Ratanpur — Mahamaya Temple',d:6,t:2,dkm:25,vh:0.75,
-   lat:22.29,lng:82.15,opt:false,
+  {id:'chitrakote',name:'Chitrakote Falls',d:4,t:1,dkm:38,vh:2,lat:19.11,lng:81.69,
+   desc:"India's widest waterfall — 300m horseshoe on the Indravati. Peak October post-monsoon flow.",
+   link:'https://en.wikipedia.org/wiki/Chitrakote_Falls'},
+  {id:'ratanpur',name:'Ratanpur — Mahamaya Temple',d:6,t:2,dkm:25,vh:0.75,lat:22.29,lng:82.15,
    desc:"11th-century Kalachuri architecture. One of CG's most important Shakti shrines. Red sandstone, carved panels.",
    link:'https://en.wikipedia.org/wiki/Ratanpur,_Chhattisgarh'},
-  {id:'achanakmar',name:'Achanakmar Tiger Reserve Corridor',d:6,t:1,dkm:0,vh:0,
-   lat:22.39,lng:81.89,opt:false,
+  {id:'achanakmar',name:'Achanakmar Tiger Reserve Corridor',d:6,t:1,dkm:0,vh:0,lat:22.39,lng:81.89,
    desc:'On-route ride through Achanakmar-Amarkantak Biosphere buffer. Elephant corridor. Sal and teak forest.',
    link:'https://en.wikipedia.org/wiki/Achanakmar_Tiger_Reserve'},
-  {id:'amarkantak',name:'Amarkantak',d:7,t:1,dkm:0,vh:3,
-   lat:22.67,lng:81.76,opt:false,
+  {id:'amarkantak',name:'Amarkantak',d:7,t:1,dkm:0,vh:3,lat:22.67,lng:81.76,
    desc:'Sacred headwaters of the Narmada at 1,048m. Ancient temple complex. Kapildhara Falls, Dudh Dhara.',
    link:'https://en.wikipedia.org/wiki/Amarkantak'},
-  {id:'bandhavgarh',name:'Bandhavgarh NP — Safari',d:7,t:1,dkm:0,vh:4,
-   lat:23.72,lng:80.98,opt:false,
+  {id:'bandhavgarh',name:'Bandhavgarh NP — Safari',d:8,t:1,dkm:0,vh:4,lat:23.72,lng:80.98,
    desc:"Highest tiger density in India. Ancient Bandhavgarh Fort (2,000-yr rock-cut caves) visible inside park.",
    link:'https://en.wikipedia.org/wiki/Bandhavgarh_National_Park'},
-  {id:'bhedaghat',name:'Bhedaghat / Marble Rocks',d:8,t:1,dkm:22,vh:2,
-   lat:23.15,lng:79.81,opt:false,
+  {id:'bhedaghat',name:'Bhedaghat / Marble Rocks',d:8,t:1,dkm:22,vh:2,lat:23.15,lng:79.81,
    desc:'Narmada cuts 100ft white marble gorge. Boat ride through canyon. Dhuandhar Falls ("Smoke Cascade").',
    link:'https://en.wikipedia.org/wiki/Bhedaghat'},
-  {id:'pachmarhi',name:'Pachmarhi',d:8,t:1,dkm:0,vh:3,
-   lat:22.47,lng:78.43,opt:false,
-   desc:"MP's only hill station (1,067m). Silver Falls (107m). Satpura ghat climb. Dhoopgarh sunrise.",
-   link:'https://en.wikipedia.org/wiki/Pachmarhi'},
-  {id:'bhimbetka',name:'Bhimbetka Rock Shelters',d:9,t:1,dkm:0,vh:1.5,
-   lat:22.94,lng:77.61,opt:false,
-   desc:'UNESCO. 750+ rock shelters with 30,000-year-old paintings. On NH46 before Bhopal — free on-route stop.',
-   link:'https://en.wikipedia.org/wiki/Bhimbetka_rock_shelters'},
-  {id:'sanchi',name:'Sanchi Stupa',d:9,t:2,dkm:45,vh:2,
-   lat:23.48,lng:77.73,opt:false,
-   desc:'Oldest stone structure in India (3rd c. BCE, Ashoka). Carved toranas — finest Buddhist sculpture. UNESCO.',
-   link:'https://en.wikipedia.org/wiki/Sanchi'},
-  {id:'ujjain',name:'Ujjain — Mahakaleshwar',d:9,t:1,dkm:0,vh:1,
-   lat:23.18,lng:75.77,opt:false,
-   desc:'Jyotirlinga. 4am Bhasma Aarti on Dussehra — cremation ash anointing, unique in India.',
-   link:'https://en.wikipedia.org/wiki/Mahakaleshwar_Jyotirlinga'},
-  {id:'omkareshwar',name:'Omkareshwar',d:10,t:1,dkm:0,vh:2,
-   lat:22.25,lng:76.15,opt:false,
-   desc:'OM-shaped island in the Narmada. Jyotirlinga. Winding descent to riverbank. Ancient island temple.',
-   link:'https://en.wikipedia.org/wiki/Omkareshwar'},
-  {id:'mandu',name:'Mandu — Medieval Ruins',d:10,t:1,dkm:0,vh:2,
-   lat:22.36,lng:75.40,opt:false,
-   desc:"Medieval plateau fort-city. Jahaz Mahal flanked by two lakes. Rani Roopmati's clifftop pavilion.",
-   link:'https://en.wikipedia.org/wiki/Mandu,_Madhya_Pradesh'},
-  {id:'maheshwar',name:'Maheshwar',d:10,t:1,dkm:0,vh:1.5,
-   lat:22.18,lng:75.59,opt:false,
-   desc:'Ahilya Fort on Narmada ghats. Stone steps, Holkar court. Silk weavers active inside the fort complex.',
-   link:'https://en.wikipedia.org/wiki/Maheshwar'},
-  // OPTIONAL
-  {id:'sirpur',name:'Sirpur Ruins',d:6,t:3,dkm:160,vh:2,
-   lat:20.97,lng:82.26,opt:true,
-   desc:'5th–8th century Buddhist and Hindu ruins. Brick Laxman Temple predates Khajuraho. Rarely visited.',
-   link:'https://en.wikipedia.org/wiki/Sirpur'},
-  {id:'barnawapara',name:'Barnawapara Wildlife Sanctuary',d:6,t:3,dkm:80,vh:3,
-   lat:21.28,lng:82.53,opt:true,
-   desc:'Private vehicle allowed inside with guide — ride your Tiger through the forest. Highest leopard density in CG.',
-   link:'https://en.wikipedia.org/wiki/Barnawapara_Wildlife_Sanctuary'},
-  {id:'bhojpur',name:'Bhojpur Temple',d:9,t:2,dkm:28,vh:0.5,
-   lat:23.07,lng:77.39,opt:true,
-   desc:'Largest Shivalinga in India (2.3m). Unfinished 11th-century temple — construction ramp still visible.',
-   link:'https://en.wikipedia.org/wiki/Bhojpur_temple'},
-  {id:'chausath',name:'Chausath Yogini Temple',d:8,t:1,dkm:0,vh:0.5,
-   lat:23.18,lng:79.84,opt:true,
+  {id:'chausath',name:'Chausath Yogini Temple',d:8,t:1,dkm:0,vh:0.5,lat:23.18,lng:79.84,
    desc:'1,000-year-old circular hilltop temple at Jabalpur. 64 Yogini figures. Near Bhedaghat. 30min stop.',
    link:'https://en.wikipedia.org/wiki/Chausath_Yogini_Temple,_Jabalpur'},
+  {id:'pachmarhi',name:'Pachmarhi',d:8,t:1,dkm:0,vh:3,lat:22.47,lng:78.43,
+   desc:"MP's only hill station (1,067m). Silver Falls (107m). Satpura ghat climb. Dhoopgarh sunrise.",
+   link:'https://en.wikipedia.org/wiki/Pachmarhi'},
+  {id:'bhimbetka',name:'Bhimbetka Rock Shelters',d:9,t:1,dkm:0,vh:1.5,lat:22.94,lng:77.61,
+   desc:'UNESCO. 750+ rock shelters with 30,000-year-old paintings. On NH46 before Bhopal — free on-route stop.',
+   link:'https://en.wikipedia.org/wiki/Bhimbetka_rock_shelters'},
+  {id:'bhojpur',name:'Bhojpur Temple',d:9,t:2,dkm:28,vh:0.5,lat:23.07,lng:77.39,
+   desc:'Largest Shivalinga in India (2.3m). Unfinished 11th-century temple — construction ramp still visible.',
+   link:'https://en.wikipedia.org/wiki/Bhojpur_temple'},
+  {id:'sanchi',name:'Sanchi Stupa',d:9,t:2,dkm:45,vh:2,lat:23.48,lng:77.73,
+   desc:'Oldest stone structure in India (3rd c. BCE, Ashoka). Carved toranas — finest Buddhist sculpture. UNESCO.',
+   link:'https://en.wikipedia.org/wiki/Sanchi'},
+  {id:'ujjain',name:'Ujjain — Mahakaleshwar',d:9,t:1,dkm:0,vh:1,lat:23.18,lng:75.77,
+   desc:'Jyotirlinga. 4am Bhasma Aarti on Dussehra — cremation ash anointing, unique in India.',
+   link:'https://en.wikipedia.org/wiki/Mahakaleshwar_Jyotirlinga'},
+  {id:'omkareshwar',name:'Omkareshwar',d:10,t:1,dkm:0,vh:2,lat:22.25,lng:76.15,
+   desc:'OM-shaped island in the Narmada. Jyotirlinga. Winding descent to riverbank. Ancient island temple.',
+   link:'https://en.wikipedia.org/wiki/Omkareshwar'},
+  {id:'mandu',name:'Mandu — Medieval Ruins',d:10,t:1,dkm:0,vh:2,lat:22.36,lng:75.40,
+   desc:"Medieval plateau fort-city. Jahaz Mahal flanked by two lakes. Rani Roopmati's clifftop pavilion.",
+   link:'https://en.wikipedia.org/wiki/Mandu,_Madhya_Pradesh'},
+  {id:'maheshwar',name:'Maheshwar',d:10,t:1,dkm:0,vh:1.5,lat:22.18,lng:75.59,
+   desc:'Ahilya Fort on Narmada ghats. Stone steps, Holkar court. Silk weavers active inside the fort complex.',
+   link:'https://en.wikipedia.org/wiki/Maheshwar'},
+  {id:'sirpur',name:'Sirpur Ruins',d:6,t:3,dkm:160,vh:2,lat:20.97,lng:82.26,
+   desc:'5th–8th century Buddhist and Hindu ruins. Brick Laxman Temple predates Khajuraho. Rarely visited.',
+   link:'https://en.wikipedia.org/wiki/Sirpur'},
+  {id:'barnawapara',name:'Barnawapara Wildlife Sanctuary',d:6,t:3,dkm:80,vh:3,lat:21.28,lng:82.53,
+   desc:'Private vehicle allowed inside with guide — ride your Tiger through the forest. Highest leopard density in CG.',
+   link:'https://en.wikipedia.org/wiki/Barnawapara_Wildlife_Sanctuary'},
 ];
 
-const PRESETS = {
-  cg:   new Set(['gadchiroli','dantewada','chitrakote','tirathgarh','kotumsar','ratanpur','achanakmar']),
-  mp:   new Set(['bhedaghat','pachmarhi','bhimbetka','sanchi','ujjain','omkareshwar','mandu','maheshwar','bandhavgarh']),
-  both: new Set(['gadchiroli','dantewada','chitrakote','tirathgarh','kotumsar','ratanpur','achanakmar',
+const PRESETS={
+  cg: new Set(['gadchiroli','dantewada','tirathgarh','kotumsar','chitrakote','ratanpur','achanakmar']),
+  mp: new Set(['bandhavgarh','bhedaghat','chausath','pachmarhi','bhimbetka','sanchi','ujjain','omkareshwar','mandu','maheshwar']),
+  both: new Set(['gadchiroli','dantewada','tirathgarh','kotumsar','chitrakote','ratanpur','achanakmar',
                  'amarkantak','bandhavgarh','bhedaghat','pachmarhi','bhimbetka','sanchi',
                  'ujjain','omkareshwar','mandu','maheshwar'])
 };
 
-// ═══════════════════════════════════
-// STATE
-// ═══════════════════════════════════
-const S = {
-  sel: new Set(PRESETS.both),
-  adays: Object.fromEntries(ATTRS.map(a=>[a.id,a.d])),
-  openDD: null,
-  showOpt: false,
-  layers: [],
-  mLayers: {},
-  map: null,
-  preset: 'both'
+const S={
+  sel:new Set(PRESETS.both),
+  adays:Object.fromEntries(ATTRS.map(a=>[a.id,a.d])),
+  openDD:null,
+  layers:[],
+  mLayers:{},
+  map:null,
+  preset:'both'
 };
 
-// ═══════════════════════════════════
-// COMPUTE
-// ═══════════════════════════════════
 function dayKm(n){
-  const base = DAYS[n-1].bkm;
-  const extra = ATTRS.filter(a=>S.adays[a.id]===n && S.sel.has(a.id)).reduce((s,a)=>s+a.dkm*2,0);
+  const base=DAYS[n-1].bkm;
+  const extra=ATTRS.filter(a=>S.adays[a.id]===n&&S.sel.has(a.id)).reduce((s,a)=>s+a.dkm*2,0);
   return base+extra;
 }
+function dayRideHrs(n){return Math.round(dayKm(n)/50*10)/10;}
 function totalKm(){let t=0;for(let i=1;i<=10;i++)t+=dayKm(i);return t;}
+function totalHrs(){return Math.round(totalKm()/50*10)/10;}
 function kmCls(km,isT){return km>(isT?1300:600)?'d':km>(isT?1100:500)?'w':'';}
 
-// ═══════════════════════════════════
-// MAP
-// ═══════════════════════════════════
 function initMap(){
   S.map=L.map('map',{center:[21,79],zoom:6});
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -490,47 +526,35 @@ function initMap(){
 function renderMap(){
   S.layers.forEach(l=>S.map.removeLayer(l));S.layers=[];
   Object.values(S.mLayers).forEach(l=>S.map.removeLayer(l));S.mLayers={};
-
   ROUTES.forEach((pts,i)=>{
     const p=L.polyline(pts,{color:DC[i],weight:4,opacity:0.85}).addTo(S.map);
     S.layers.push(p);
   });
-
-  // Fixed stops
   [{lat:12.97,lng:77.59,lbl:'BLR Start',d:1},{lat:21.15,lng:79.09,lbl:'Nagpur',d:2},
    {lat:22.72,lng:75.86,lbl:'Indore End',d:10}].forEach(p=>{
     const m=L.circleMarker([p.lat,p.lng],{radius:9,fillColor:'#fff',color:DC[p.d-1],weight:3,fillOpacity:1}).addTo(S.map);
     m.bindTooltip(p.lbl,{permanent:false,direction:'top'});S.layers.push(m);
   });
-
-  // Attraction markers
   ATTRS.forEach(a=>{
-    const on=S.sel.has(a.id);
-    const dn=S.adays[a.id];
-    const col=on?DC[dn-1]:'#444';
+    const on=S.sel.has(a.id);const dn=S.adays[a.id];const col=on?DC[dn-1]:'#444';
     const m=L.circleMarker([a.lat,a.lng],{
       radius:on?7:5,fillColor:col,color:on?'#fff':'#333',
       weight:1.5,fillOpacity:on?0.95:0.4,opacity:on?1:0.5
     }).addTo(S.map);
-    const tierTxt=a.t===1?'🟢 on-route':a.t===2?'🟡 peel-off':'🔴 diversion';
-    m.bindPopup(`<div style="font-family:sans-serif;min-width:180px">
-      <b style="font-size:13px">${a.name}</b><br>
-      <span style="font-size:11px;color:#666">Day ${dn} &nbsp;·&nbsp; ${tierTxt}</span><br>
-      ${a.vh>0?`<span style="font-size:11px">${a.vh}hrs visit</span><br>`:''}
-      ${a.dkm>0?`<span style="font-size:11px">+${a.dkm*2}km detour</span><br>`:''}
-      <a href="${a.link}" target="_blank" style="font-size:11px;color:#3a7fd5">📖 Wikipedia →</a>
-    </div>`);
+    const tierTxt=a.t===1?'on-route':a.t===2?'peel-off':'diversion';
+    m.bindPopup('<div style="font-family:sans-serif;min-width:180px"><b style="font-size:13px">'+a.name+'</b><br>'
+      +'<span style="font-size:11px;color:#666">Day '+dn+' &middot; '+tierTxt+'</span><br>'
+      +(a.vh>0?'<span style="font-size:11px">'+a.vh+'hrs visit</span><br>':'')
+      +(a.dkm>0?'<span style="font-size:11px">+'+a.dkm*2+'km detour</span><br>':'')
+      +'<a href="'+a.link+'" target="_blank" style="font-size:11px;color:#3a7fd5">📖 Wikipedia →</a></div>');
     S.mLayers[a.id]=m;
   });
 }
 
-// ═══════════════════════════════════
-// RENDER TIMELINE (LEFT)
-// ═══════════════════════════════════
 function renderTimeline(){
   const el=document.getElementById('daylist');el.innerHTML='';
   DAYS.forEach((d,i)=>{
-    const km=dayKm(d.n);const kc=kmCls(km,d.n===1);
+    const km=dayKm(d.n);const hrs=dayRideHrs(d.n);const kc=kmCls(km,d.n===1);
     const div=document.createElement('div');
     div.className='drow'+(S.openDD===d.n?' act':'');
     div.onclick=()=>openDD(d.n);
@@ -542,38 +566,33 @@ function renderTimeline(){
         ${d.warn?'<span class="dwarn">⚠️</span>':''}
       </div>
       <div class="droute">${d.from} → ${d.to}</div>
-      <div class="dmeta"><span class="dkm ${kc}">${km.toLocaleString()}km</span> · ${d.night}</div>`;
+      <div class="dmeta">
+        <span class="dkm ${kc}">${km.toLocaleString()}km</span> · ~${hrs}h riding<br>
+        ${d.buffer?'<span class="dbuf">🔵 BUFFER</span>':''}${d.night}
+      </div>`;
     el.appendChild(div);
   });
 }
 
-// ═══════════════════════════════════
-// RENDER ATTRACTIONS (RIGHT)
-// ═══════════════════════════════════
 function renderAttrs(){
   const el=document.getElementById('attrlist');el.innerHTML='';
   for(let d=1;d<=10;d++){
-    const da=ATTRS.filter(a=>S.adays[a.id]===d&&!a.opt);
+    const da=ATTRS.filter(a=>S.adays[a.id]===d);
     if(!da.length)continue;
-    const km=dayKm(d);const kc=kmCls(km,d===1);
+    const km=dayKm(d);const hrs=dayRideHrs(d);const kc=kmCls(km,d===1);
     const h=document.createElement('div');h.className='shdr';
-    h.innerHTML=`<span>Day ${d} · ${DAYS[d-1].date}</span><span class="shkm ${kc}">${km}km</span>`;
+    h.innerHTML=`<span>Day ${d} · ${DAYS[d-1].date}</span><span class="shkm ${kc}">${km}km · ~${hrs}h</span>`;
     el.appendChild(h);
     da.forEach(a=>el.appendChild(mkCard(a)));
   }
-  const ob=document.createElement('div');ob.className='optbtn';
-  ob.innerHTML=`${S.showOpt?'▾':'▸'} Optional Detours — decide on the fly`;
-  ob.onclick=()=>{S.showOpt=!S.showOpt;renderAttrs();};
-  el.appendChild(ob);
-  if(S.showOpt){ATTRS.filter(a=>a.opt).forEach(a=>el.appendChild(mkCard(a)));}
 }
 
 function mkCard(a){
   const on=S.sel.has(a.id);const dn=S.adays[a.id];const col=DC[dn-1];
-  const tl=a.t===1?'🟢 on-route':a.t===2?'🟡 peel-off':'🔴 diversion';
-  const tc=`t${a.t}`;
-  const meta=[a.vh>0?`${a.vh}hrs`:'',a.dkm>0?`+${a.dkm*2}km`:''].filter(Boolean).join(' · ');
-  const div=document.createElement('div');div.className='acard';div.id=`c-${a.id}`;
+  const tl=a.t===1?'on-route':a.t===2?'peel-off':'diversion';
+  const tc='t'+a.t;
+  const meta=[a.vh>0?a.vh+'hrs':'',a.dkm>0?'+'+a.dkm*2+'km':''].filter(Boolean).join(' · ');
+  const div=document.createElement('div');div.className='acard';div.id='c-'+a.id;
   div.innerHTML=`
     <div class="ar1">
       <input type="checkbox" class="achk" id="chk-${a.id}" ${on?'checked':''} onchange="toggleA('${a.id}',this.checked)">
@@ -589,25 +608,20 @@ function mkCard(a){
   return div;
 }
 
-// ═══════════════════════════════════
-// DAY PICKER
-// ═══════════════════════════════════
 function openPicker(id,ev){
   ev.stopPropagation();
   document.querySelectorAll('.dpicker').forEach(e=>e.remove());
-  const card=document.getElementById(`c-${id}`);if(!card)return;
-  const attr=ATTRS.find(a=>a.id===id);
-  const cur=S.adays[id];
+  const card=document.getElementById('c-'+id);if(!card)return;
+  const attr=ATTRS.find(a=>a.id===id);const cur=S.adays[id];
   const dp=document.createElement('div');dp.className='dpicker';
-  let html=`<div class="dptitle">Move to day:</div><div class="dpopts">`;
+  let html='<div class="dptitle">Move to day:</div><div class="dpopts">';
   DAYS.forEach((d,i)=>{
     const newKm=dayKm(d.n)+(d.n!==cur?attr.dkm*2:0);
     const kc=kmCls(newKm,d.n===1);
-    const warn=kc?` ⚠️`:'';
-    html+=`<button class="dpopt${d.n===cur?' cur':''}" style="background:${DC[i]}"
-      title="Day ${d.n}: ~${newKm}km${warn}" onclick="setDay('${id}',${d.n})">D${d.n}</button>`;
+    html+='<button class="dpopt'+(d.n===cur?' cur':'')+'" style="background:'+DC[i]+'"'
+      +' title="Day '+d.n+': ~'+newKm+'km'+(kc?' ⚠️':'')+'" onclick="setDay(\''+id+'\','+d.n+')">D'+d.n+'</button>';
   });
-  html+=`</div><div class="dpkm">Hover a day to see km impact</div>`;
+  html+='</div><div class="dpkm">Hover a day to see km impact</div>';
   dp.innerHTML=html;
   card.style.position='relative';card.appendChild(dp);
   setTimeout(()=>{
@@ -615,31 +629,32 @@ function openPicker(id,ev){
   },50);
 }
 
-// ═══════════════════════════════════
-// DAY DETAIL OVERLAY
-// ═══════════════════════════════════
 function openDD(n){
   S.openDD=n;
-  const d=DAYS[n-1];const col=DC[n-1];const km=dayKm(n);
+  const d=DAYS[n-1];const col=DC[n-1];const km=dayKm(n);const hrs=dayRideHrs(n);
   const kc=kmCls(km,n===1);
   let h=`<div class="ddhdr" style="border-top:4px solid ${col}">
     <div>
       <div class="ddtitle">Day ${n} &nbsp;·&nbsp; ${d.date}</div>
       <div class="ddsub">${d.from} → ${d.to}<br>
         <span class="${kc?'dkm '+kc:''}">${km.toLocaleString()}km</span>
-        &nbsp;·&nbsp; Night: ${d.night}
-        ${!d.duskOk?'&nbsp;·&nbsp; <span style="color:var(--warn)">⚠️ Arrive before dark</span>':''}
+        &nbsp;·&nbsp; ~${hrs}h riding &nbsp;·&nbsp; ${d.night}
+        ${!d.duskOk?'<br><span style="color:var(--warn)">⚠️ Arrive before dark</span>':''}
       </div>
     </div>
     <button class="ddx" onclick="closeDD()">✕</button>
   </div>`;
+
+  if(d.buffer){
+    h+=`<div class="bufbox"><div class="buftitle">🔵 Buffer Day</div>
+      <div class="crittext" style="font-size:11px">This day is intentionally unscheduled. Use it to recover from any earlier setback, or as a pure personal day. Do not compress it away unless absolutely necessary.</div></div>`;
+  }
 
   if(d.crit){
     h+=`<div class="crit"><div class="crittitle">⚠️ Critique &amp; Watch-outs</div>
       <div class="crittext">${d.crit.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div></div>`;
   }
 
-  // Schedule
   if(d.sched.length){
     h+=`<div class="ddsec"><div class="ddsectitle">Estimated Schedule</div>`;
     d.sched.forEach(s=>{
@@ -649,7 +664,16 @@ function openDD(n){
     h+=`</div>`;
   }
 
-  // Active stops for this day
+  if(d.food&&d.food.length){
+    h+=`<div class="ddsec"><div class="ddsectitle">⛽ Pit Stops &amp; Food</div>`;
+    d.food.forEach(f=>{
+      const ico=f.type==='fuel'?'⛽':f.type==='note'?'📝':'🍽️';
+      h+=`<div class="irow"><div class="iico">${ico}</div>
+        <div class="itxt">${f.name}${f.km>0?` <span style="color:var(--txt2);font-size:10px">· ~${f.km}km</span>`:''}</div></div>`;
+    });
+    h+=`</div>`;
+  }
+
   const active=ATTRS.filter(a=>S.adays[a.id]===n&&S.sel.has(a.id));
   if(active.length){
     h+=`<div class="ddsec"><div class="ddsectitle">Active Stops This Day</div>`;
@@ -667,12 +691,10 @@ function openDD(n){
     h+=`</div>`;
   }
 
-  // Road + fuel notes
   h+=`<div class="ddsec"><div class="ddsectitle">Road &amp; Fuel Notes</div>`;
   d.road.forEach(r=>{h+=`<div class="irow"><div class="itxt">${r}</div></div>`;});
   h+=`</div>`;
 
-  // Pre-booking
   if(d.prebook.length){
     h+=`<div class="ddsec"><div class="ddsectitle">Pre-Booking Required</div>`;
     d.prebook.forEach(p=>{
@@ -684,31 +706,12 @@ function openDD(n){
     h+=`</div>`;
   }
 
-  // Optional detours for this day (not selected)
-  const opts=ATTRS.filter(a=>S.adays[a.id]===n&&a.opt&&!S.sel.has(a.id));
-  if(opts.length){
-    h+=`<div class="ddsec"><div class="ddsectitle">Optional Detours — Decide on the Fly</div>`;
-    opts.forEach(a=>{
-      const tl=a.t===2?'🟡':'🔴';
-      h+=`<div class="irow" style="margin-bottom:10px">
-        <div class="iico">${tl}</div>
-        <div class="itxt">
-          <strong style="color:#fff">${a.name}</strong> &nbsp;+${a.dkm*2}km &nbsp;·&nbsp; ${a.vh}hrs<br>
-          ${a.desc}<br>
-          <a href="${a.link}" target="_blank" style="color:#6aabf0;font-size:11px">📖 Read →</a>
-          &nbsp;&nbsp;<button class="addopt" onclick="addOpt('${a.id}')">+ Add to day</button>
-        </div></div>`;
-    });
-    h+=`</div>`;
-  }
-
   h+=`<div class="ddnav">
     ${n>1?`<button class="ddnbtn" onclick="openDD(${n-1})">◀ Day ${n-1}</button>`:'<div></div>'}
     ${n<10?`<button class="ddnbtn" onclick="openDD(${n+1})">Day ${n+1} ▶</button>`:'<div></div>'}
   </div>`;
 
   document.getElementById('ddcontent').innerHTML=h;
-  document.getElementById('rp').style.display='none';
   document.getElementById('dd').style.display='block';
   document.getElementById('obk').style.display='block';
   renderTimeline();
@@ -718,13 +721,9 @@ function closeDD(){
   S.openDD=null;
   document.getElementById('dd').style.display='none';
   document.getElementById('obk').style.display='none';
-  document.getElementById('rp').style.display='';
   renderTimeline();
 }
 
-// ═══════════════════════════════════
-// INTERACTIONS
-// ═══════════════════════════════════
 function toggleA(id,on){
   on?S.sel.add(id):S.sel.delete(id);
   S.preset=null;
@@ -739,22 +738,10 @@ function setDay(id,n){
   if(S.openDD)openDD(S.openDD);
 }
 
-function addOpt(id){
-  S.sel.add(id);S.showOpt=true;
-  render();if(S.openDD)openDD(S.openDD);
-}
-
 function applyPreset(name){
   S.sel=new Set(PRESETS[name]);
   ATTRS.forEach(a=>{S.adays[a.id]=a.d;});
   S.preset=name;
-  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
-  const map={'cg':'CG','mp':'MP','both':'Both'};
-  document.querySelectorAll('.pb').forEach(b=>{
-    if(b.textContent.includes(map[name])||b.textContent.includes('★'&&name==='both'))
-      b.classList.add('on');
-  });
-  // fix preset button highlight
   const btns=document.querySelectorAll('.pb');
   btns.forEach(b=>b.classList.remove('on'));
   if(name==='cg')btns[0].classList.add('on');
@@ -764,16 +751,14 @@ function applyPreset(name){
 }
 
 function renderStats(){
-  const t=totalKm();
+  const t=totalKm();const h=totalHrs();
   document.getElementById('statkm').textContent=t.toLocaleString();
   document.getElementById('statadd').textContent=Math.round(t/10);
+  document.getElementById('stathrs').textContent=h+'h';
 }
 
-function render(){
-  renderStats();renderTimeline();renderAttrs();renderMap();
-}
+function render(){renderStats();renderTimeline();renderAttrs();renderMap();}
 
-// Mobile tabs
 function mobTab(tab,el){
   document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
@@ -781,16 +766,13 @@ function mobTab(tab,el){
   closeDD();
   if(tab==='days'){
     const lp=document.getElementById('lp');
-    lp.style.display='block';lp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
+    lp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
   }else if(tab==='attr'){
     const rp=document.getElementById('rp');
-    rp.style.display='block';rp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
+    rp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
   }
 }
 
-// ═══════════════════════════════════
-// INIT
-// ═══════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
   initMap();render();
   window.addEventListener('resize',()=>S.map.invalidateSize());

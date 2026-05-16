@@ -86,8 +86,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .achk{width:14px;height:14px;cursor:pointer;flex-shrink:0;accent-color:var(--ok)}
 .aname{font-size:12px;font-weight:600;color:#fff;flex:1;cursor:pointer;line-height:1.3}
 .aname.off{color:var(--txt2)}
-.dbadge{padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;
-  cursor:pointer;border:none;color:#fff;flex-shrink:0}
+.dbadge{padding:3px 8px;border-radius:3px;font-size:10px;font-weight:700;
+  cursor:pointer;border:none;color:#fff;flex-shrink:0;min-width:36px;text-align:center}
 .dbadge:hover{filter:brightness(1.2)}
 .ar2{display:flex;align-items:center;gap:5px;padding-left:21px;margin-bottom:3px}
 .tb{padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600}
@@ -99,8 +99,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .adesc{font-size:11px;color:var(--txt2);padding-left:21px;line-height:1.45}
 
 /* ── DAY PICKER ── */
-.dpicker{position:absolute;right:12px;background:#252845;border:1px solid var(--bdr);
-  border-radius:6px;padding:8px;z-index:50;min-width:210px;
+.dpicker{position:absolute;right:0;background:#252845;border:1px solid var(--bdr);
+  border-radius:6px;padding:8px;z-index:300;min-width:210px;max-width:calc(100vw - 24px);
   box-shadow:0 6px 20px rgba(0,0,0,.6)}
 .dptitle{font-size:9px;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
 .dpopts{display:flex;flex-wrap:wrap;gap:4px}
@@ -125,6 +125,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .ddx{background:none;border:none;color:var(--txt2);font-size:18px;cursor:pointer;
   padding:3px 7px;border-radius:4px}
 .ddx:hover{color:#fff;background:var(--bdr)}
+.dd-back{display:none}
 .crit{margin:14px 18px 0;padding:11px 13px;background:rgba(243,156,18,.12);
   border-left:3px solid var(--warn);border-radius:4px}
 .bufbox{margin:14px 18px 0;padding:11px 13px;background:rgba(79,195,247,.1);
@@ -188,16 +189,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   #obk{left:0;right:0;top:40px}
   /* zoom controls: keep visible */
   .leaflet-control-zoom{margin-bottom:10px!important}
+  /* back bar: full-width tap target on mobile */
+  .dd-back{display:flex;align-items:center;padding:13px 16px;
+    background:var(--sur3);font-size:14px;font-weight:700;color:var(--ok);
+    border-bottom:1px solid var(--bdr);cursor:pointer;gap:6px;letter-spacing:.2px}
+  /* mobile preset pill row */
+  #mob-presets{display:flex!important}
 }
 /* old mobnav — disabled */
 #mobnav{display:none!important}
+/* mobile preset row (hidden on desktop) */
+#mob-presets{display:none;gap:8px;padding:7px 12px;align-items:center;
+  background:var(--sur);border-bottom:1px solid var(--bdr);flex-shrink:0;order:3}
+.mpb{padding:5px 12px;border-radius:12px;font-size:11px;font-weight:700;
+  border:1px solid var(--bdr);background:transparent;color:var(--txt2);cursor:pointer}
+.mpb.on{background:var(--sur3);color:#fff;border-color:#666}
 </style>
 </head>
 <body>
 
 <!-- STATS BAR -->
 <div id="sbar">
-  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026<span class="ver">v1.7</span></div>
+  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026<span class="ver">v1.8</span></div>
   <div id="mob-km" style="display:none;font-size:12px;font-weight:700;color:var(--ok);margin-left:8px"></div>
   <div class="ssep"></div>
   <div class="stat"><span class="sv" id="statkm">—</span><span class="sl">Total km</span></div>
@@ -223,10 +236,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 <div id="main">
   <div id="lp"><div class="ptitle">Day Timeline</div><div id="daylist"></div></div>
   <div id="mc"><div id="map"></div></div>
-  <!-- Mobile tab switcher: sits between map and panel -->
+  <!-- Mobile tab switcher + preset pills (mobile only) -->
   <div id="mob-sw">
     <button class="msw on" onclick="mobSwitch('days',this)">📅 Days</button>
     <button class="msw" onclick="mobSwitch('places',this)">📍 Places</button>
+  </div>
+  <div id="mob-presets">
+    <span style="font-size:10px;color:var(--txt2);font-weight:600">SHOW:</span>
+    <button class="mpb" onclick="applyPreset('cg')">CG</button>
+    <button class="mpb" onclick="applyPreset('mp')">MP</button>
+    <button class="mpb on" onclick="applyPreset('both')">All ★</button>
   </div>
   <div id="rp"><div class="ptitle">Attractions &amp; Detours</div><div id="attrlist"></div></div>
 </div>
@@ -528,7 +547,7 @@ const PRESETS={
 const S={
   sel:new Set(PRESETS.both),
   adays:Object.fromEntries(ATTRS.map(a=>[a.id,a.d])),
-  openDD:null,
+  openDD:null,histPushed:false,
   layers:[],
   mLayers:{},
   map:null,
@@ -654,7 +673,7 @@ function openPicker(id,ev){
   ev.stopPropagation();
   document.querySelectorAll('.dpicker').forEach(e=>e.remove());
   const card=document.getElementById('c-'+id);if(!card)return;
-  const attr=ATTRS.find(a=>a.id===id);const cur=S.adays[id];
+  const attr=ATTRS.find(a=>a.id===id);if(!attr)return;const cur=S.adays[id];
   const dp=document.createElement('div');dp.className='dpicker';
   let html='<div class="dptitle">Move to day:</div><div class="dpopts">';
   DAYS.forEach((d,i)=>{
@@ -673,9 +692,11 @@ function openPicker(id,ev){
 
 function openDD(n){
   S.openDD=n;
+  if(!S.histPushed){history.pushState({dd:n},'');S.histPushed=true;}
   const d=DAYS[n-1];const col=DC[n-1];const km=dayKm(n);const hrs=dayRideHrs(n);
   const kc=kmCls(km,n===1);
-  let h=`<div class="ddhdr" style="border-top:4px solid ${col}">
+  let h=`<div class="dd-back" onclick="closeDD()">← Back to Days</div>
+  <div class="ddhdr" style="border-top:4px solid ${col}">
     <div>
       <div class="ddtitle">Day ${n} &nbsp;·&nbsp; ${d.date}</div>
       <div class="ddsub">${d.from} → ${d.to}<br>
@@ -760,12 +781,16 @@ function openDD(n){
   zoomToDay(n);
 }
 
-function closeDD(){
-  S.openDD=null;
+function _closeDD(){
+  S.openDD=null;S.histPushed=false;
   document.getElementById('dd').style.display='none';
   document.getElementById('obk').style.display='none';
   renderTimeline();
   zoomToAll();
+}
+function closeDD(){
+  if(S.histPushed){S.histPushed=false;history.back();return;}
+  _closeDD();
 }
 
 function zoomToDay(n){
@@ -773,7 +798,11 @@ function zoomToDay(n){
   ATTRS.filter(a=>S.adays[a.id]===n).forEach(a=>pts.push([a.lat,a.lng]));
   if(pts.length<1)return;
   S.map.invalidateSize();
-  S.map.flyToBounds(L.latLngBounds(pts),{padding:[50,50],maxZoom:12,duration:0.7});
+  const bounds=L.latLngBounds(pts);
+  if(!bounds.isValid()||bounds.getNorthEast().equals(bounds.getSouthWest())){
+    S.map.flyTo([pts[0][0],pts[0][1]],11,{duration:0.7});return;
+  }
+  S.map.flyToBounds(bounds,{padding:[50,50],maxZoom:12,duration:0.7});
 }
 
 function zoomToAll(){
@@ -799,11 +828,18 @@ function applyPreset(name){
   S.sel=new Set(PRESETS[name]);
   ATTRS.forEach(a=>{S.adays[a.id]=a.d;});
   S.preset=name;
+  // sync desktop preset buttons
   const btns=document.querySelectorAll('.pb');
   btns.forEach(b=>b.classList.remove('on'));
   if(name==='cg')btns[0].classList.add('on');
   else if(name==='mp')btns[1].classList.add('on');
   else btns[2].classList.add('on');
+  // sync mobile preset pills
+  const mpbs=document.querySelectorAll('.mpb');
+  mpbs.forEach(b=>b.classList.remove('on'));
+  if(name==='cg')mpbs[0].classList.add('on');
+  else if(name==='mp')mpbs[1].classList.add('on');
+  else mpbs[2].classList.add('on');
   render();
 }
 
@@ -829,6 +865,7 @@ function mobSwitch(tab,el){
 document.addEventListener('DOMContentLoaded',()=>{
   initMap();render();
   window.addEventListener('resize',()=>S.map.invalidateSize());
+  window.addEventListener('popstate',()=>{if(S.openDD)_closeDD();});
 });
 </script>
 </body>

@@ -160,24 +160,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 ::-webkit-scrollbar-track{background:var(--sur)}
 ::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
 
-/* ── MOBILE ── */
+/* ── MOB SWITCHER (between map and panel) — hidden on desktop ── */
+#mob-sw{display:none}
+
+/* ── MOBILE: split-screen layout ── */
 @media(max-width:600px){
-  #lp,#rp{display:none}
-  #dd{width:100%}
-  #mobnav{display:flex!important}
+  body{height:100dvh}
+  /* compact stats bar — logo + km only */
+  #sbar{height:40px;padding:0 10px;gap:8px}
+  #sbar .ssep,#sbar .stat,#sbar .presets{display:none}
+  #mob-km{display:block!important}
+  #sbar .logo{font-size:11px}
+  /* column layout: map on top, panel on bottom */
+  #main{flex-direction:column}
+  #mc{order:1;flex:none;height:42dvh;width:100%}
+  /* tab switcher between map and panel */
+  #mob-sw{display:flex;order:2;width:100%;flex-shrink:0;
+    background:var(--sur2);border-top:2px solid var(--bdr);border-bottom:1px solid var(--bdr)}
+  .msw{flex:1;padding:11px 0;border:none;background:none;color:var(--txt2);
+    font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.2px}
+  .msw.on{color:#fff;background:var(--sur3)}
+  /* panels fill remaining height */
+  #lp{order:3;width:100%;border-right:none;flex:1;min-height:0}
+  #rp{order:3;width:100%;border-left:none;flex:1;min-height:0;display:none}
+  /* day detail: full screen on mobile */
+  #dd{width:100%;left:0;top:40px}
+  #obk{left:0;right:0;top:40px}
+  /* zoom controls: keep visible */
+  .leaflet-control-zoom{margin-bottom:10px!important}
 }
-#mobnav{display:none;background:var(--sur);border-top:1px solid var(--bdr);
-  position:fixed;bottom:0;left:0;right:0;z-index:100}
-.mtab{flex:1;padding:10px 0;font-size:11px;font-weight:600;color:var(--txt2);
-  cursor:pointer;border:none;background:none;text-align:center}
-.mtab.on{color:var(--ok)}
+/* old mobnav — disabled */
+#mobnav{display:none!important}
 </style>
 </head>
 <body>
 
 <!-- STATS BAR -->
 <div id="sbar">
-  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026<span class="ver">v1.6</span></div>
+  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026<span class="ver">v1.7</span></div>
+  <div id="mob-km" style="display:none;font-size:12px;font-weight:700;color:var(--ok);margin-left:8px"></div>
   <div class="ssep"></div>
   <div class="stat"><span class="sv" id="statkm">—</span><span class="sl">Total km</span></div>
   <div class="ssep"></div>
@@ -198,23 +219,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   </div>
 </div>
 
-<!-- MAIN 3-PANEL -->
+<!-- MAIN 3-PANEL (desktop: row | mobile: column) -->
 <div id="main">
   <div id="lp"><div class="ptitle">Day Timeline</div><div id="daylist"></div></div>
   <div id="mc"><div id="map"></div></div>
+  <!-- Mobile tab switcher: sits between map and panel -->
+  <div id="mob-sw">
+    <button class="msw on" onclick="mobSwitch('days',this)">📅 Days</button>
+    <button class="msw" onclick="mobSwitch('places',this)">📍 Places</button>
+  </div>
   <div id="rp"><div class="ptitle">Attractions &amp; Detours</div><div id="attrlist"></div></div>
 </div>
 
 <!-- OVERLAY (map dimmer — click to close detail) -->
 <div id="obk" onclick="closeDD()"></div>
 <div id="dd"><div id="ddcontent"></div></div>
-
-<!-- MOBILE NAV -->
-<div id="mobnav">
-  <button class="mtab on" onclick="mobTab('map',this)">🗺️ Map</button>
-  <button class="mtab" onclick="mobTab('days',this)">📅 Days</button>
-  <button class="mtab" onclick="mobTab('attr',this)">📍 Places</button>
-</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -793,37 +812,23 @@ function renderStats(){
   document.getElementById('statkm').textContent=t.toLocaleString();
   document.getElementById('statadd').textContent=Math.round(t/10);
   document.getElementById('stathrs').textContent=h+'h';
+  document.getElementById('mob-km').textContent=t.toLocaleString()+'km · '+h+'h riding';
 }
 
 function render(){renderStats();renderTimeline();renderAttrs();renderMap();}
 
-function mobTab(tab,el){
-  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
+function mobSwitch(tab,el){
+  document.querySelectorAll('.msw').forEach(b=>b.classList.remove('on'));
   el.classList.add('on');
-  ['lp','rp'].forEach(id=>{document.getElementById(id).style.display='none';});
-  closeDD();
-  if(tab==='days'){
-    const lp=document.getElementById('lp');
-    lp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
-  }else if(tab==='attr'){
-    const rp=document.getElementById('rp');
-    rp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
-  }
-}
-
-function checkMobile(){
-  const mob=window.innerWidth<=600;
-  document.getElementById('mobnav').style.display=mob?'flex':'none';
-  if(!mob){
-    document.getElementById('lp').style.cssText='';
-    document.getElementById('rp').style.cssText='';
-  }
+  const lp=document.getElementById('lp');
+  const rp=document.getElementById('rp');
+  if(tab==='days'){lp.style.display='flex';lp.style.flexDirection='column';rp.style.display='none';}
+  else{rp.style.display='flex';rp.style.flexDirection='column';lp.style.display='none';}
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
   initMap();render();
-  window.addEventListener('resize',()=>{S.map.invalidateSize();checkMobile();});
-  checkMobile();
+  window.addEventListener('resize',()=>S.map.invalidateSize());
 });
 </script>
 </body>

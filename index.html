@@ -526,8 +526,10 @@ function initMap(){
 function renderMap(){
   S.layers.forEach(l=>S.map.removeLayer(l));S.layers=[];
   Object.values(S.mLayers).forEach(l=>S.map.removeLayer(l));S.mLayers={};
+  const active=S.openDD;
   ROUTES.forEach((pts,i)=>{
-    const p=L.polyline(pts,{color:DC[i],weight:4,opacity:0.85}).addTo(S.map);
+    const dayN=i+1;const isActive=active&&dayN===active;const isOther=active&&dayN!==active;
+    const p=L.polyline(pts,{color:DC[i],weight:isActive?6:4,opacity:isOther?0.2:0.85}).addTo(S.map);
     S.layers.push(p);
   });
   [{lat:12.97,lng:77.59,lbl:'BLR Start',d:1},{lat:21.15,lng:79.09,lbl:'Nagpur',d:2},
@@ -537,9 +539,10 @@ function renderMap(){
   });
   ATTRS.forEach(a=>{
     const on=S.sel.has(a.id);const dn=S.adays[a.id];const col=on?DC[dn-1]:'#444';
+    const dimmed=active&&dn!==active;
     const m=L.circleMarker([a.lat,a.lng],{
       radius:on?7:5,fillColor:col,color:on?'#fff':'#333',
-      weight:1.5,fillOpacity:on?0.95:0.4,opacity:on?1:0.5
+      weight:1.5,fillOpacity:dimmed?0.15:(on?0.95:0.4),opacity:dimmed?0.2:(on?1:0.5)
     }).addTo(S.map);
     const tierTxt=a.t===1?'on-route':a.t===2?'peel-off':'diversion';
     m.bindPopup('<div style="font-family:sans-serif;min-width:180px"><b style="font-size:13px">'+a.name+'</b><br>'
@@ -715,6 +718,7 @@ function openDD(n){
   document.getElementById('dd').style.display='block';
   document.getElementById('obk').style.display='block';
   renderTimeline();
+  zoomToDay(n);
 }
 
 function closeDD(){
@@ -722,6 +726,21 @@ function closeDD(){
   document.getElementById('dd').style.display='none';
   document.getElementById('obk').style.display='none';
   renderTimeline();
+  zoomToAll();
+}
+
+function zoomToDay(n){
+  const pts=[...ROUTES[n-1]];
+  ATTRS.filter(a=>S.adays[a.id]===n).forEach(a=>pts.push([a.lat,a.lng]));
+  if(pts.length<1)return;
+  const bounds=L.latLngBounds(pts);
+  S.map.invalidateSize();
+  S.map.flyToBounds(bounds,{padding:[40,40],maxZoom:10,duration:0.6});
+}
+
+function zoomToAll(){
+  const all=ROUTES.flat();
+  S.map.flyToBounds(L.latLngBounds(all),{padding:[30,30],maxZoom:7,duration:0.6});
 }
 
 function toggleA(id,on){

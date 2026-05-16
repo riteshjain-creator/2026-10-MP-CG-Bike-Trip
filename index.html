@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiger's Run — BLR → CG → MP → Indore 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c1:#E74C3C;--c2:#E67E22;--c3:#F39C12;--c4:#2ECC71;
+  --c5:#1ABC9C;--c6:#3498DB;--c7:#9B59B6;--c8:#E91E63;
+  --c9:#00BCD4;--c10:#795548;
+  --bg:#12121e;--sur:#1a1a2e;--sur2:#1e2240;--sur3:#252845;
+  --txt:#e0e0e0;--txt2:#8888aa;--bdr:#2a2a45;
+  --ok:#2ecc71;--warn:#f39c12;--danger:#e74c3c;
+  --sh:56px;--lw:260px;--rw:330px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--txt);height:100vh;overflow:hidden;
+  display:flex;flex-direction:column}
+
+/* ── STATS BAR ── */
+#sbar{height:var(--sh);background:var(--sur);border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;padding:0 14px;gap:12px;flex-shrink:0;
+  font-size:12px;overflow-x:auto;white-space:nowrap}
+#sbar .logo{font-weight:800;font-size:14px;color:#fff;letter-spacing:-0.3px}
+.ssep{width:1px;height:28px;background:var(--bdr);flex-shrink:0}
+.stat{display:flex;flex-direction:column;align-items:center;gap:1px}
+.sv{font-size:14px;font-weight:700;color:var(--ok)}
+.sv.w{color:var(--warn)}.sv.d{color:var(--danger)}
+.sl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px}
+.presets{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+.pb{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;
+  border:1px solid var(--bdr);background:transparent;color:var(--txt2);
+  cursor:pointer;transition:all .2s}
+.pb:hover,.pb.on{background:var(--sur3);color:#fff;border-color:#555}
+
+/* ── MAIN ── */
+#main{display:flex;flex:1;overflow:hidden}
+
+/* ── LEFT PANEL ── */
+#lp{width:var(--lw);background:var(--sur);border-right:1px solid var(--bdr);
+  overflow-y:auto;flex-shrink:0}
+.ptitle{padding:10px 12px 8px;font-size:10px;font-weight:700;color:var(--txt2);
+  text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--bdr)}
+.drow{padding:9px 12px;border-bottom:1px solid var(--bdr);cursor:pointer;transition:background .15s}
+.drow:hover,.drow.act{background:var(--sur2)}
+.dhdr{display:flex;align-items:center;gap:7px;margin-bottom:2px}
+.ddot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dnum{font-size:11px;font-weight:700;color:#fff}
+.ddate{font-size:10px;color:var(--txt2)}
+.dwarn{font-size:11px;margin-left:auto}
+.droute{font-size:12px;color:var(--txt);margin-bottom:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dmeta{font-size:10px;color:var(--txt2)}
+.dkm{font-weight:600}.dkm.w{color:var(--warn)}.dkm.d{color:var(--danger)}
+
+/* ── MAP ── */
+#mc{flex:1;position:relative;min-width:0}
+#map{width:100%;height:100%}
+
+/* ── RIGHT PANEL ── */
+#rp{width:var(--rw);background:var(--sur);border-left:1px solid var(--bdr);
+  overflow-y:auto;flex-shrink:0;position:relative}
+.shdr{padding:7px 12px;font-size:10px;font-weight:700;color:var(--txt2);
+  text-transform:uppercase;letter-spacing:.8px;background:var(--sur2);
+  border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;
+  align-items:center;position:sticky;top:0;z-index:2}
+.shkm{font-size:11px;font-weight:600;color:var(--txt)}
+.shkm.w{color:var(--warn)}.shkm.d{color:var(--danger)}
+.acard{padding:9px 12px;border-bottom:1px solid var(--bdr)}
+.ar1{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.achk{width:14px;height:14px;cursor:pointer;flex-shrink:0;accent-color:var(--ok)}
+.aname{font-size:12px;font-weight:600;color:#fff;flex:1;cursor:pointer;line-height:1.3}
+.aname.off{color:var(--txt2)}
+.dbadge{padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;
+  cursor:pointer;border:none;color:#fff;flex-shrink:0}
+.dbadge:hover{filter:brightness(1.2)}
+.ar2{display:flex;align-items:center;gap:5px;padding-left:21px;margin-bottom:3px}
+.tb{padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600}
+.t1{background:#1a4d2e;color:#5dde8a}.t2{background:#4d3800;color:#e0a000}
+.t3{background:#4d1111;color:#e06060}
+.amet{font-size:10px;color:var(--txt2)}
+.alink{font-size:11px;color:#6aabf0;text-decoration:none;margin-left:auto}
+.alink:hover{text-decoration:underline}
+.adesc{font-size:11px;color:var(--txt2);padding-left:21px;line-height:1.45}
+.optbtn{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--txt2);border-bottom:1px solid var(--bdr)}
+.optbtn:hover{background:var(--sur2)}
+
+/* ── DAY PICKER ── */
+.dpicker{position:absolute;right:12px;background:#252845;border:1px solid var(--bdr);
+  border-radius:6px;padding:8px;z-index:50;min-width:210px;
+  box-shadow:0 6px 20px rgba(0,0,0,.6)}
+.dptitle{font-size:9px;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+.dpopts{display:flex;flex-wrap:wrap;gap:4px}
+.dpopt{padding:3px 7px;border-radius:3px;font-size:10px;font-weight:700;
+  cursor:pointer;color:#fff;border:none;transition:filter .15s}
+.dpopt:hover{filter:brightness(1.2)}
+.dpopt.cur{outline:2px solid #fff;outline-offset:1px}
+.dpkm{font-size:9px;color:var(--txt2);margin-top:6px}
+
+/* ── OVERLAY & DAY DETAIL ── */
+#obk{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none}
+#dd{position:fixed;top:var(--sh);right:0;bottom:0;width:480px;
+  background:var(--sur);border-left:2px solid var(--bdr);overflow-y:auto;
+  z-index:201;display:none}
+.ddhdr{padding:14px 18px;background:var(--sur2);border-bottom:1px solid var(--bdr);
+  display:flex;justify-content:space-between;align-items:flex-start}
+.ddtitle{font-size:17px;font-weight:800;color:#fff}
+.ddsub{font-size:12px;color:var(--txt2);margin-top:3px;line-height:1.5}
+.ddx{background:none;border:none;color:var(--txt2);font-size:18px;cursor:pointer;
+  padding:3px 7px;border-radius:4px}
+.ddx:hover{color:#fff;background:var(--bdr)}
+.crit{margin:14px 18px 0;padding:11px 13px;background:rgba(243,156,18,.12);
+  border-left:3px solid var(--warn);border-radius:4px}
+.crittitle{font-size:10px;font-weight:700;color:var(--warn);margin-bottom:5px;
+  text-transform:uppercase;letter-spacing:.6px}
+.crittext{font-size:12px;color:var(--txt);line-height:1.6}
+.ddsec{margin:14px 18px 0}
+.ddsectitle{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:9px;border-bottom:1px solid var(--bdr);padding-bottom:4px}
+.si{display:flex;gap:10px;margin-bottom:10px}
+.stime{font-size:11px;color:var(--txt2);width:58px;flex-shrink:0;padding-top:2px}
+.scnt .sname{font-size:13px;font-weight:600;color:#fff}
+.scnt .ssub{font-size:11px;color:var(--txt2);margin-top:2px;line-height:1.45}
+.irow{display:flex;gap:8px;margin-bottom:8px}
+.iico{font-size:13px;flex-shrink:0;margin-top:1px}
+.itxt{font-size:12px;color:var(--txt);line-height:1.5}
+.pb2item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;
+  background:rgba(231,76,60,.1);border-radius:4px;margin-bottom:5px;border:1px solid rgba(231,76,60,.2)}
+.pb2name{font-size:12px;font-weight:600;color:#fff}
+.pb2sub{font-size:10px;color:var(--txt2);margin-top:2px}
+.pb2sub a{color:#6aabf0;text-decoration:none}
+.pb2sub a:hover{text-decoration:underline}
+.ddnav{display:flex;gap:8px;margin:18px 18px 0;padding-bottom:24px}
+.ddnbtn{flex:1;padding:8px;border-radius:5px;font-size:12px;font-weight:600;
+  border:1px solid var(--bdr);background:var(--sur2);color:var(--txt);cursor:pointer;text-align:center}
+.ddnbtn:hover{background:var(--sur3);color:#fff}
+.addopt{font-size:10px;padding:2px 8px;border-radius:3px;
+  background:var(--sur2);border:1px solid var(--bdr);color:var(--txt);cursor:pointer}
+.addopt:hover{background:var(--sur3)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--sur)}
+::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  #lp,#rp{display:none}
+  #dd{width:100%}
+  #mobnav{display:flex!important}
+}
+#mobnav{display:none;background:var(--sur);border-top:1px solid var(--bdr);
+  position:fixed;bottom:0;left:0;right:0;z-index:100}
+.mtab{flex:1;padding:10px 0;font-size:11px;font-weight:600;color:var(--txt2);
+  cursor:pointer;border:none;background:none;text-align:center}
+.mtab.on{color:var(--ok)}
+</style>
+</head>
+<body>
+
+<!-- STATS BAR -->
+<div id="sbar">
+  <div class="logo">🏍️ Tiger's Run &nbsp;·&nbsp; BLR→Indore 2026</div>
+  <div class="ssep"></div>
+  <div class="stat"><span class="sv" id="statkm">—</span><span class="sl">Total km</span></div>
+  <div class="ssep"></div>
+  <div class="stat"><span class="sv" id="statdays">10</span><span class="sl">Days</span></div>
+  <div class="ssep"></div>
+  <div class="stat"><span class="sv" id="statadd">—</span><span class="sl">Avg km/day</span></div>
+  <div class="ssep"></div>
+  <div class="stat"><span class="sv">Oct 11–20</span><span class="sl">Dates</span></div>
+  <div class="ssep"></div>
+  <div class="stat"><span class="sv">🌅 5:52pm</span><span class="sl">Sunset (Oct)</span></div>
+  <div class="presets">
+    <button class="pb" onclick="applyPreset('cg')">CG Deep Dive</button>
+    <button class="pb" onclick="applyPreset('mp')">MP Highlights</button>
+    <button class="pb on" id="pb-both" onclick="applyPreset('both')">Best of Both ★</button>
+  </div>
+</div>
+
+<!-- MAIN 3-PANEL -->
+<div id="main">
+  <div id="lp"><div class="ptitle">Day Timeline</div><div id="daylist"></div></div>
+  <div id="mc"><div id="map"></div></div>
+  <div id="rp"><div class="ptitle">Attractions &amp; Detours</div><div id="attrlist"></div></div>
+</div>
+
+<!-- OVERLAY -->
+<div id="obk" onclick="closeDD()"></div>
+<div id="dd"><div id="ddcontent"></div></div>
+
+<!-- MOBILE NAV -->
+<div id="mobnav">
+  <button class="mtab on" onclick="mobTab('map',this)">🗺️ Map</button>
+  <button class="mtab" onclick="mobTab('days',this)">📅 Days</button>
+  <button class="mtab" onclick="mobTab('attr',this)">📍 Places</button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ═══════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════
+const DC = ['#E74C3C','#E67E22','#F39C12','#2ECC71','#1ABC9C','#3498DB','#9B59B6','#E91E63','#00BCD4','#795548'];
+
+const DAYS = [
+{n:1,date:'Oct 11 (Sun)',from:'Bangalore',to:'Nagpur',bkm:1075,night:'Nagpur',duskOk:true,warn:true,
+ crit:'No buffer on this 1,075km day. Hard decision point at Hyderabad (km ~570, ~3pm): if delayed by rain or breakdown, night at Hyderabad and resume Day 2 from there.\n\nBoothpur stretch after Jadcherla is patchy. Speed breakers post-Karnataka border are unmarked — hazardous at night. Do not ride past 8pm.',
+ sched:[
+  {t:'4:00am',n:'🚀 Depart Bangalore',s:'NH44 North. Fill tank. Leave before traffic.'},
+  {t:'~7:30am',n:'Kurnool area',s:'~270km. First fuel stop. Boothpur rough stretch ahead.'},
+  {t:'~11:30am',n:'⚠️ Hyderabad — Decision Point',s:'570km done. If any delay, night here. Otherwise continue.'},
+  {t:'~3:30pm',n:'🏍️ Wardha / Amravati area',s:'Push on.'},
+  {t:'~6:30pm',n:'🏁 Nagpur',s:'1,075km. Night halt.'},
+ ],
+ road:['⛽ Fuel: NH44 well-served. No dead zones.','📶 Connectivity: Good throughout.','⚠️ Boothpur stretch (Jadcherla area): rough, narrow.','🌧️ Oct: Rain possible near BLR. NH44 handles well.'],
+ prebook:[]},
+
+{n:2,date:'Oct 12 (Mon)',from:'Nagpur',to:'Jagdalpur via Gadchiroli',bkm:480,night:'Jagdalpur',duskOk:true,warn:true,
+ crit:'SECURITY: Chandrapur→Gadchiroli→Bijapur→Jagdalpur crosses historically Naxal-affected Bijapur district (CG). Verify ground conditions in September 2026 before committing.\n\nCONTINGENCY: If advisory active, use Nagpur→Raipur (NH53, 290km)→Kanker→Jagdalpur (310km) = 600km. Accept Kanker↔Jagdalpur repeat on exit leg.\n\nFUEL: Last reliable fuel at Chandrapur. ~300km gap to Jagdalpur. Carry fuel can. Fill to brim at Chandrapur.',
+ sched:[
+  {t:'7:00am',n:'🚀 Depart Nagpur',s:''},
+  {t:'~9:00am',n:'⛽ Chandrapur',s:'150km. FILL FUEL + CARRY CAN. Last reliable fuel for 300km.'},
+  {t:'~11:30am',n:'Gadchiroli',s:'150km from Chandrapur. Enter tribal forest corridor. No signal.'},
+  {t:'~1:00pm',n:'🏍️ Bhamragad → Bijapur CG',s:'Dense forest. No signal. Slow state roads.'},
+  {t:'~5:30pm',n:'🏁 Jagdalpur',s:'~480km. 3 nights here.'},
+ ],
+ road:['⛽ CARRY FUEL CAN. Fill at Chandrapur. ~300km gap.','📵 No signal from Gadchiroli onward. Download offline maps before Day 1.','⚠️ Bijapur district: verify security Sep 2026.','🌿 Highlight: Dense tribal forest, Indravati River, raw roads.'],
+ prebook:[]},
+
+{n:3,date:'Oct 13 (Tue)',from:'Jagdalpur',to:'Dantewada + back',bkm:170,night:'Jagdalpur',duskOk:true,warn:false,
+ crit:null,
+ sched:[
+  {t:'8:00am',n:'🚀 Depart Jagdalpur',s:'85km south on NH30 to Dantewada.'},
+  {t:'~9:30am',n:'🛕 Danteshwari Temple, Dantewada',s:'14th-century Shakti Peetha. Check access protocol for non-tribal visitors during Dussehra festival season.'},
+  {t:'~11:30am',n:'🏍️ Return to Jagdalpur',s:'85km back north.'},
+  {t:'~1:00pm',n:'Jagdalpur town',s:'Bastar Palace, Anthropological Museum, tribal craft market.'},
+  {t:'Evening',n:'🎪 Bastar Dussehra atmosphere',s:'Pre-festival processions, tribal drumming and street markets.'},
+ ],
+ road:['⛽ Fuel: Jagdalpur city.','📶 Weak signal in Dantewada surrounds.','ℹ️ Dantewada: travel during daylight only.','🎭 Check which Dussehra rituals are scheduled this date.'],
+ prebook:[]},
+
+{n:4,date:'Oct 14 (Wed)',from:'Jagdalpur',to:'Circular day rides',bkm:150,night:'Jagdalpur',duskOk:true,warn:false,
+ crit:null,
+ sched:[
+  {t:'7:30am',n:'🚀 → Chitrakote Falls',s:'38km west. Fork off NH30.'},
+  {t:'~8:30am',n:'💧 Chitrakote Falls',s:"India's widest waterfall — 300m horseshoe on the Indravati. Peak October flow. Parvati Caves on left bank. 2hrs."},
+  {t:'~11:00am',n:'🏍️ Return to Jagdalpur → East',s:'38km back, then 65km east into Kanger Valley.'},
+  {t:'~1:00pm',n:'🌊 Tirathgarh Falls',s:'Tiered 91m plunge on Kanger River. Crystal-clear water. Dense forest. 1.5hrs.'},
+  {t:'~2:30pm',n:'🕳️ Kotumsar Caves',s:'Near Tirathgarh. Guide required + permit at gate. One of India\'s longest cave systems — stalactites, underground river. 2hrs.'},
+  {t:'~5:30pm',n:'🏁 Jagdalpur',s:'65km return.'},
+ ],
+ road:['⛽ Fuel: Jagdalpur. No issues on day rides.','📵 Kanger Valley: no signal.','🎫 Kotumsar: guide + entry permit at gate. Bring torch.','🌿 Kanger road: beautiful forest ride, well-maintained.'],
+ prebook:[{n:'Kotumsar Caves guide',s:'Paid at gate day-of',u:null,r:false}]},
+
+{n:5,date:'Oct 15 (Thu)',from:'Jagdalpur',to:'Kanker',bkm:160,night:'Kanker ❤️',duskOk:true,warn:false,
+ crit:null,
+ sched:[
+  {t:'9:00am',n:'🚀 Depart Jagdalpur',s:'Short day by design.'},
+  {t:'~10:00am',n:'Kondagaon (en route)',s:'56km. Check for weekly tribal haat market — if market day, worth 30 mins.'},
+  {t:'~12:30pm',n:'❤️ Kanker',s:'160km. Arrive early. Full afternoon free.'},
+  {t:'Afternoon',n:'Kanker town',s:'Walk the streets. School visit. Kanker Palace. Dudh River. Local fort and temples.'},
+ ],
+ road:['⛽ Fuel: Jagdalpur or Kondagaon.','📶 Moderate connectivity.','❤️ Personal day — short and easy.','ℹ️ Kondagaon tribal haat: check weekly market day calendar.'],
+ prebook:[{n:'Kanker accommodation',s:'Kanker Palace heritage hotel or CG Tourism rest house',u:'https://www.chhattisgarhtourism.co.in',r:true}]},
+
+{n:6,date:'Oct 16 (Fri)',from:'Kanker',to:'Amarkantak',bkm:515,night:'Amarkantak',duskOk:false,warn:true,
+ crit:'KM CORRECTION: This day is ~515km (not 400km). With Ratanpur detour it is at the upper limit of an attraction day.\n\nDARKNESS: Final 50km to Amarkantak is a ghat climb. DO NOT arrive after dark. Leave Kanker by 7:00am sharp.\n\nMORNING: 280km of highway (Kanker→Raipur→Bilaspur) before the forest begins at Achanakmar. Functional, not scenic, until Bilaspur.',
+ sched:[
+  {t:'7:00am',n:'🚀 Depart Kanker',s:'⚠️ Must leave by 7am to reach Amarkantak before dark.'},
+  {t:'~9:30am',n:'Raipur',s:'150km. Pass through. NH30.'},
+  {t:'~11:00am',n:'⛽ Bilaspur — FILL FUEL',s:'130km from Raipur. Last reliable fuel for 185km.'},
+  {t:'~11:30am',n:'🛕 Ratanpur detour',s:'25km off Bilaspur. Mahamaya Temple — 11th-c Kalachuri architecture, one of CG\'s most important Shakti shrines. 45min. Return 25km to highway.'},
+  {t:'~1:00pm',n:'🌿 Achanakmar corridor',s:'Enter Achanakmar Tiger Reserve buffer. Part of Achanakmar-Amarkantak Biosphere. Slow down. Elephant corridor. No signal.'},
+  {t:'~3:30pm',n:'🏁 Amarkantak',s:'~515km. 🌅 Sunset 5:52pm — 2.5hrs daylight on arrival. Check in to MPTDC bungalow.'},
+ ],
+ road:['⛽ Fill at Bilaspur. 185km gap to Amarkantak.','📵 No signal from Achanakmar onward.','⚠️ Amarkantak ghat last 50km — winding. No night riding.','🛣️ Kanker→Bilaspur: good NH. Bilaspur→Amarkantak: state road, manageable.'],
+ prebook:[{n:'Amarkantak MPTDC Bungalow',s:'Book ahead — limited rooms',u:'https://www.mptourism.com',r:true}]},
+
+{n:7,date:'Oct 17 (Sat)',from:'Amarkantak',to:'Bandhavgarh',bkm:230,night:'Bandhavgarh',duskOk:true,warn:false,
+ crit:null,
+ sched:[
+  {t:'6:00am',n:'🕉️ Narmada Udgam',s:'Source of the Narmada. Ancient temple complex at 1,048m. Cool morning air.'},
+  {t:'~7:30am',n:'💧 Kapildhara Falls',s:"Narmada's first major drop — 100ft. 3km walk or viewpoint drive. 45min."},
+  {t:'~8:30am',n:'Dudh Dhara + Sone Muda',s:'Milky cascade. Source of Son River also here — two great rivers born at Amarkantak. 30min.'},
+  {t:'~9:30am',n:'🚀 Depart Amarkantak',s:''},
+  {t:'~10:30am',n:'🏍️ Anuppur → Shahdol',s:'⛽ Fill fuel at Shahdol.'},
+  {t:'~1:30pm',n:'🏁 Bandhavgarh',s:'~230km. Arrive afternoon. Confirm safari booking. Rest.'},
+ ],
+ road:['⛽ Fill at Shahdol (~130km from Amarkantak).','📶 Signal weak Amarkantak, improves from Anuppur.','🏨 Stay near Tala Gate for 6am safari access tomorrow.','🎫 Confirm Tala Zone safari booking today.'],
+ prebook:[
+  {n:'Bandhavgarh Tala Zone Safari',s:'Oct 18, 6am — book 4–6 weeks ahead',u:'https://mponline.gov.in',r:true},
+  {n:'Bandhavgarh buffer lodge',s:'Must be walking distance to Tala gate',u:null,r:true}]},
+
+{n:8,date:'Oct 18 (Sun)',from:'Bandhavgarh',to:'Pachmarhi',bkm:420,night:'Pachmarhi',duskOk:true,warn:true,
+ crit:'ZERO SLACK: Safari 6am–10am + 420km + Bhedaghat = 12-hour day with no margin.\n\nBHEDAGHAT HARD CAP: 2 hours maximum. Depart by 3:15pm regardless. The marble gorge at evening light is very compelling — leave anyway.\n\nCONTINGENCY: If safari runs long or delayed, night at Jabalpur (after Bhedaghat). Pachmarhi is a short 2hr hop on Day 9 morning.',
+ sched:[
+  {t:'5:30am',n:'🚀 Tala Gate',s:'Be at gate 15min early.'},
+  {t:'6:00am',n:'🐯 Bandhavgarh Safari',s:'Tala Zone. Highest tiger density in India. Ancient Bandhavgarh Fort (rock-cut caves, 2,000yrs old) visible inside park. 4hrs.'},
+  {t:'10:15am',n:'🚀 Depart Bandhavgarh',s:''},
+  {t:'~12:45pm',n:'⛽ Jabalpur',s:'195km. Fill fuel.'},
+  {t:'~1:15pm',n:'🏛️ Bhedaghat / Marble Rocks',s:'22km from Jabalpur. Narmada cuts 100ft white marble gorge. Boat ride through canyon. Dhuandhar Falls ("Smoke Cascade"). ⏰ HARD DEPART 3:15pm.'},
+  {t:'3:15pm',n:'🚀 Depart Bhedaghat',s:'Hard cap. → Pipariya → Pachmarhi ghat.'},
+  {t:'~4:00pm',n:'⛽ Pipariya',s:'Top up fuel. Start ghat climb.'},
+  {t:'~6:15pm',n:'🏁 Pachmarhi',s:'195km via Satpura ghat. MPTDC bungalow.'},
+ ],
+ road:['⛽ Jabalpur (fill). Top up Pipariya before ghat.','📶 Good signal Jabalpur. Weak in Pachmarhi.','🏔️ Pipariya→Pachmarhi ghat: 55km switchbacks through sal forest. Allow 1hr.','⚠️ Confirm MPTDC Pachmarhi reservation.'],
+ prebook:[{n:'Pachmarhi MPTDC Bungalow',s:'Book at mptourism.com',u:'https://www.mptourism.com',r:true}]},
+
+{n:9,date:'Oct 19 (Mon)',from:'Pachmarhi',to:'Ujjain',bkm:500,night:'Ujjain',duskOk:true,warn:true,
+ crit:'LEAVE EARLY: Depart Pachmarhi by 7am. Day has 500km + 3 proper stops.\n\nSEQUENCING: Bhimbetka is 45km BEFORE Bhopal coming from Pachmarhi (south on NH46). Correct order: Pachmarhi → Bhimbetka → Bhopal → Sanchi → Ujjain.\n\nBHOJPUR DROPPED: Too much for this day. Bhojpur (unfinished Shiva temple, 28km SW of Bhopal) is an optional detour — toggle it in the app if you want to add it.',
+ sched:[
+  {t:'7:00am',n:'🚀 Depart Pachmarhi',s:'Leave early. Long day.'},
+  {t:'~9:30am',n:'🏛️ Bhimbetka Rock Shelters',s:'190km via Hoshangabad. On NH46 before Bhopal — free on-route stop. UNESCO. 30,000-year-old rock paintings in 750+ shelters. 1.5hrs.'},
+  {t:'~11:00am',n:'⛽ Bhopal',s:'45km from Bhimbetka. Pass through. Fill fuel.'},
+  {t:'~11:45am',n:'🕌 Sanchi Stupa',s:'45km NE of Bhopal. Oldest stone structure in India (3rd century BCE, Emperor Ashoka). Carved toranas are finest Buddhist sculpture in the world. UNESCO. 2hrs.'},
+  {t:'~2:00pm',n:'🚀 Depart Sanchi → Ujjain',s:'220km, ~3hrs.'},
+  {t:'~5:00pm',n:'🏁 Ujjain',s:'Night halt. Tomorrow: Dussehra Bhasma Aarti at 4am.'},
+ ],
+ road:['⛽ Bhopal (fill before Sanchi leg).','📶 Good throughout.','🛣️ Bhopal→Sanchi→Ujjain: northward dog-leg (+90km vs direct). Worth it for Sanchi.','ℹ️ Optional: Bhojpur Temple (+56km from Bhopal, 30min stop) — toggle in app.'],
+ prebook:[{n:'Mahakaleshwar Bhasma Aarti slot',s:'Oct 20, 4am — book at shrimahakaleshwar.com',u:'https://www.shrimahakaleshwar.com',r:true}]},
+
+{n:10,date:'Oct 20 (Tue) — DUSSEHRA 🎆',from:'Ujjain',to:'Indore',bkm:315,night:'Indore ✈️',duskOk:true,warn:true,
+ crit:'BHASMA AARTI: Requires advance slot booking at Mahakaleshwar devasthan trust portal. Walk-in darshan is possible but the aarti close-up needs a pre-booked slot. Treat this as mandatory — same priority as Bandhavgarh safari.\n\nFLIGHT: Arrive Indore by ~3pm. Book evening flight (6pm+) from IDR to BLR. Confirm bike handover to trusted garage before flying.',
+ sched:[
+  {t:'3:30am',n:'🛕 Mahakaleshwar Temple',s:'Pre-booked Bhasma Aarti slot. Cremation ash anointed on deity. DUSSEHRA morning. Unique in India.'},
+  {t:'~6:00am',n:'🚀 Depart Ujjain',s:'Leisurely final day. 315km with 4 stops.'},
+  {t:'~8:00am',n:'🕉️ Omkareshwar',s:'130km. OM-shaped island in the Narmada. Jyotirlinga. Winding descent to riverbank. Boat or bridge to island temple. 2hrs.'},
+  {t:'~10:30am',n:'🏰 Mandu',s:'60km. Medieval plateau ruins. Jahaz Mahal flanked by two lakes. Rani Roopmati\'s hilltop pavilion. Ride between monuments. 2hrs.'},
+  {t:'~1:00pm',n:'⛵ Maheshwar',s:'35km. Ahilya Fort on Narmada. Stone ghats, Holkar court. Active silk weavers inside fort. 1.5hrs.'},
+  {t:'~3:00pm',n:'🏁 Indore',s:'90km. Drop bike. Fly home. 🎉'},
+ ],
+ road:['⛽ Ujjain (fill). No dead zones on this leg.','📶 Good throughout.','✈️ Indore airport (IDR): ~12km from city. Evening BLR flights.','🔧 Bike: Arrange trusted Triumph-capable garage handover before arriving.'],
+ prebook:[
+  {n:'Bhasma Aarti slot — Mahakaleshwar',s:'Oct 20, 4am — MANDATORY',u:'https://www.shrimahakaleshwar.com',r:true},
+  {n:'Indore bike storage / garage',s:'Arrange trusted Triumph-capable mechanic',u:null,r:true},
+  {n:'Indore→Bangalore flight (IDR→BLR)',s:'Book evening Oct 20',u:'https://www.makemytrip.com',r:false}]}
+];
+
+// ROUTE POLYLINES per day
+const ROUTES = [
+  [[12.97,77.59],[13.34,77.10],[14.23,76.40],[15.14,76.93],[15.83,78.04],[17.38,78.49],[18.67,78.09],[19.15,77.32],[20.93,77.75],[21.15,79.09]],
+  [[21.15,79.09],[20.75,78.60],[19.96,79.30],[20.10,80.01],[18.96,80.03],[18.84,80.79],[19.07,82.03]],
+  [[19.07,82.03],[18.90,81.35],[19.07,82.03]],
+  [[19.07,82.03],[19.11,81.69],[19.14,82.03],[19.14,81.94],[19.12,81.98],[19.07,82.03]],
+  [[19.07,82.03],[19.59,81.66],[20.28,81.49]],
+  [[20.28,81.49],[21.25,81.63],[22.08,82.14],[22.29,82.15],[22.08,82.14],[22.39,81.89],[22.67,81.76]],
+  [[22.67,81.76],[23.10,81.68],[23.30,81.36],[23.53,80.84],[23.72,80.98]],
+  [[23.72,80.98],[23.83,80.40],[23.18,79.99],[23.15,79.81],[22.77,78.35],[22.47,78.43]],
+  [[22.47,78.43],[22.75,77.73],[22.94,77.61],[23.26,77.41],[23.52,77.82],[23.48,77.73],[23.26,77.41],[22.97,76.05],[23.18,75.77]],
+  [[23.18,75.77],[22.75,75.90],[22.25,76.15],[22.36,75.40],[22.18,75.59],[22.72,75.86]]
+];
+
+// ATTRACTIONS
+const ATTRS = [
+  {id:'gadchiroli',name:'Gadchiroli Forest Corridor',d:2,t:1,dkm:0,vh:0,
+   lat:20.10,lng:80.01,opt:false,
+   desc:'Dense tribal forests, Indravati corridor. Raw adventure entry into Bastar region.',
+   link:'https://en.wikipedia.org/wiki/Gadchiroli_district'},
+  {id:'dantewada',name:'Danteshwari Temple, Dantewada',d:3,t:1,dkm:85,vh:1.5,
+   lat:18.90,lng:81.35,opt:false,
+   desc:'14th-century Shakti Peetha — one of 52 most sacred goddess temples in India. Ancient Bastar royal patronage.',
+   link:'https://en.wikipedia.org/wiki/Danteshwari_Temple'},
+  {id:'chitrakote',name:'Chitrakote Falls',d:4,t:1,dkm:38,vh:2,
+   lat:19.11,lng:81.69,opt:false,
+   desc:"India's widest waterfall — 300m horseshoe on the Indravati. Peak October post-monsoon flow.",
+   link:'https://en.wikipedia.org/wiki/Chitrakote_Falls'},
+  {id:'tirathgarh',name:'Tirathgarh Falls',d:4,t:1,dkm:65,vh:1.5,
+   lat:19.14,lng:81.94,opt:false,
+   desc:'Tiered 91m plunge in Kanger Valley NP. Crystal-clear Kanger River. Stunning forest setting.',
+   link:'https://en.wikipedia.org/wiki/Tirathgarh_Falls'},
+  {id:'kotumsar',name:'Kotumsar Caves',d:4,t:1,dkm:0,vh:2,
+   lat:19.12,lng:81.98,opt:false,
+   desc:"One of India's longest cave systems. Stalactites, underground river. Near Tirathgarh. Guide required.",
+   link:'https://en.wikipedia.org/wiki/Kotumsar_Cave'},
+  {id:'ratanpur',name:'Ratanpur — Mahamaya Temple',d:6,t:2,dkm:25,vh:0.75,
+   lat:22.29,lng:82.15,opt:false,
+   desc:"11th-century Kalachuri architecture. One of CG's most important Shakti shrines. Red sandstone, carved panels.",
+   link:'https://en.wikipedia.org/wiki/Ratanpur,_Chhattisgarh'},
+  {id:'achanakmar',name:'Achanakmar Tiger Reserve Corridor',d:6,t:1,dkm:0,vh:0,
+   lat:22.39,lng:81.89,opt:false,
+   desc:'On-route ride through Achanakmar-Amarkantak Biosphere buffer. Elephant corridor. Sal and teak forest.',
+   link:'https://en.wikipedia.org/wiki/Achanakmar_Tiger_Reserve'},
+  {id:'amarkantak',name:'Amarkantak',d:7,t:1,dkm:0,vh:3,
+   lat:22.67,lng:81.76,opt:false,
+   desc:'Sacred headwaters of the Narmada at 1,048m. Ancient temple complex. Kapildhara Falls, Dudh Dhara.',
+   link:'https://en.wikipedia.org/wiki/Amarkantak'},
+  {id:'bandhavgarh',name:'Bandhavgarh NP — Safari',d:7,t:1,dkm:0,vh:4,
+   lat:23.72,lng:80.98,opt:false,
+   desc:"Highest tiger density in India. Ancient Bandhavgarh Fort (2,000-yr rock-cut caves) visible inside park.",
+   link:'https://en.wikipedia.org/wiki/Bandhavgarh_National_Park'},
+  {id:'bhedaghat',name:'Bhedaghat / Marble Rocks',d:8,t:1,dkm:22,vh:2,
+   lat:23.15,lng:79.81,opt:false,
+   desc:'Narmada cuts 100ft white marble gorge. Boat ride through canyon. Dhuandhar Falls ("Smoke Cascade").',
+   link:'https://en.wikipedia.org/wiki/Bhedaghat'},
+  {id:'pachmarhi',name:'Pachmarhi',d:8,t:1,dkm:0,vh:3,
+   lat:22.47,lng:78.43,opt:false,
+   desc:"MP's only hill station (1,067m). Silver Falls (107m). Satpura ghat climb. Dhoopgarh sunrise.",
+   link:'https://en.wikipedia.org/wiki/Pachmarhi'},
+  {id:'bhimbetka',name:'Bhimbetka Rock Shelters',d:9,t:1,dkm:0,vh:1.5,
+   lat:22.94,lng:77.61,opt:false,
+   desc:'UNESCO. 750+ rock shelters with 30,000-year-old paintings. On NH46 before Bhopal — free on-route stop.',
+   link:'https://en.wikipedia.org/wiki/Bhimbetka_rock_shelters'},
+  {id:'sanchi',name:'Sanchi Stupa',d:9,t:2,dkm:45,vh:2,
+   lat:23.48,lng:77.73,opt:false,
+   desc:'Oldest stone structure in India (3rd c. BCE, Ashoka). Carved toranas — finest Buddhist sculpture. UNESCO.',
+   link:'https://en.wikipedia.org/wiki/Sanchi'},
+  {id:'ujjain',name:'Ujjain — Mahakaleshwar',d:9,t:1,dkm:0,vh:1,
+   lat:23.18,lng:75.77,opt:false,
+   desc:'Jyotirlinga. 4am Bhasma Aarti on Dussehra — cremation ash anointing, unique in India.',
+   link:'https://en.wikipedia.org/wiki/Mahakaleshwar_Jyotirlinga'},
+  {id:'omkareshwar',name:'Omkareshwar',d:10,t:1,dkm:0,vh:2,
+   lat:22.25,lng:76.15,opt:false,
+   desc:'OM-shaped island in the Narmada. Jyotirlinga. Winding descent to riverbank. Ancient island temple.',
+   link:'https://en.wikipedia.org/wiki/Omkareshwar'},
+  {id:'mandu',name:'Mandu — Medieval Ruins',d:10,t:1,dkm:0,vh:2,
+   lat:22.36,lng:75.40,opt:false,
+   desc:"Medieval plateau fort-city. Jahaz Mahal flanked by two lakes. Rani Roopmati's clifftop pavilion.",
+   link:'https://en.wikipedia.org/wiki/Mandu,_Madhya_Pradesh'},
+  {id:'maheshwar',name:'Maheshwar',d:10,t:1,dkm:0,vh:1.5,
+   lat:22.18,lng:75.59,opt:false,
+   desc:'Ahilya Fort on Narmada ghats. Stone steps, Holkar court. Silk weavers active inside the fort complex.',
+   link:'https://en.wikipedia.org/wiki/Maheshwar'},
+  // OPTIONAL
+  {id:'sirpur',name:'Sirpur Ruins',d:6,t:3,dkm:160,vh:2,
+   lat:20.97,lng:82.26,opt:true,
+   desc:'5th–8th century Buddhist and Hindu ruins. Brick Laxman Temple predates Khajuraho. Rarely visited.',
+   link:'https://en.wikipedia.org/wiki/Sirpur'},
+  {id:'barnawapara',name:'Barnawapara Wildlife Sanctuary',d:6,t:3,dkm:80,vh:3,
+   lat:21.28,lng:82.53,opt:true,
+   desc:'Private vehicle allowed inside with guide — ride your Tiger through the forest. Highest leopard density in CG.',
+   link:'https://en.wikipedia.org/wiki/Barnawapara_Wildlife_Sanctuary'},
+  {id:'bhojpur',name:'Bhojpur Temple',d:9,t:2,dkm:28,vh:0.5,
+   lat:23.07,lng:77.39,opt:true,
+   desc:'Largest Shivalinga in India (2.3m). Unfinished 11th-century temple — construction ramp still visible.',
+   link:'https://en.wikipedia.org/wiki/Bhojpur_temple'},
+  {id:'chausath',name:'Chausath Yogini Temple',d:8,t:1,dkm:0,vh:0.5,
+   lat:23.18,lng:79.84,opt:true,
+   desc:'1,000-year-old circular hilltop temple at Jabalpur. 64 Yogini figures. Near Bhedaghat. 30min stop.',
+   link:'https://en.wikipedia.org/wiki/Chausath_Yogini_Temple,_Jabalpur'},
+];
+
+const PRESETS = {
+  cg:   new Set(['gadchiroli','dantewada','chitrakote','tirathgarh','kotumsar','ratanpur','achanakmar']),
+  mp:   new Set(['bhedaghat','pachmarhi','bhimbetka','sanchi','ujjain','omkareshwar','mandu','maheshwar','bandhavgarh']),
+  both: new Set(['gadchiroli','dantewada','chitrakote','tirathgarh','kotumsar','ratanpur','achanakmar',
+                 'amarkantak','bandhavgarh','bhedaghat','pachmarhi','bhimbetka','sanchi',
+                 'ujjain','omkareshwar','mandu','maheshwar'])
+};
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+const S = {
+  sel: new Set(PRESETS.both),
+  adays: Object.fromEntries(ATTRS.map(a=>[a.id,a.d])),
+  openDD: null,
+  showOpt: false,
+  layers: [],
+  mLayers: {},
+  map: null,
+  preset: 'both'
+};
+
+// ═══════════════════════════════════
+// COMPUTE
+// ═══════════════════════════════════
+function dayKm(n){
+  const base = DAYS[n-1].bkm;
+  const extra = ATTRS.filter(a=>S.adays[a.id]===n && S.sel.has(a.id)).reduce((s,a)=>s+a.dkm*2,0);
+  return base+extra;
+}
+function totalKm(){let t=0;for(let i=1;i<=10;i++)t+=dayKm(i);return t;}
+function kmCls(km,isT){return km>(isT?1300:600)?'d':km>(isT?1100:500)?'w':'';}
+
+// ═══════════════════════════════════
+// MAP
+// ═══════════════════════════════════
+function initMap(){
+  S.map=L.map('map',{center:[21,79],zoom:6});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(S.map);
+}
+
+function renderMap(){
+  S.layers.forEach(l=>S.map.removeLayer(l));S.layers=[];
+  Object.values(S.mLayers).forEach(l=>S.map.removeLayer(l));S.mLayers={};
+
+  ROUTES.forEach((pts,i)=>{
+    const p=L.polyline(pts,{color:DC[i],weight:4,opacity:0.85}).addTo(S.map);
+    S.layers.push(p);
+  });
+
+  // Fixed stops
+  [{lat:12.97,lng:77.59,lbl:'BLR Start',d:1},{lat:21.15,lng:79.09,lbl:'Nagpur',d:2},
+   {lat:22.72,lng:75.86,lbl:'Indore End',d:10}].forEach(p=>{
+    const m=L.circleMarker([p.lat,p.lng],{radius:9,fillColor:'#fff',color:DC[p.d-1],weight:3,fillOpacity:1}).addTo(S.map);
+    m.bindTooltip(p.lbl,{permanent:false,direction:'top'});S.layers.push(m);
+  });
+
+  // Attraction markers
+  ATTRS.forEach(a=>{
+    const on=S.sel.has(a.id);
+    const dn=S.adays[a.id];
+    const col=on?DC[dn-1]:'#444';
+    const m=L.circleMarker([a.lat,a.lng],{
+      radius:on?7:5,fillColor:col,color:on?'#fff':'#333',
+      weight:1.5,fillOpacity:on?0.95:0.4,opacity:on?1:0.5
+    }).addTo(S.map);
+    const tierTxt=a.t===1?'🟢 on-route':a.t===2?'🟡 peel-off':'🔴 diversion';
+    m.bindPopup(`<div style="font-family:sans-serif;min-width:180px">
+      <b style="font-size:13px">${a.name}</b><br>
+      <span style="font-size:11px;color:#666">Day ${dn} &nbsp;·&nbsp; ${tierTxt}</span><br>
+      ${a.vh>0?`<span style="font-size:11px">${a.vh}hrs visit</span><br>`:''}
+      ${a.dkm>0?`<span style="font-size:11px">+${a.dkm*2}km detour</span><br>`:''}
+      <a href="${a.link}" target="_blank" style="font-size:11px;color:#3a7fd5">📖 Wikipedia →</a>
+    </div>`);
+    S.mLayers[a.id]=m;
+  });
+}
+
+// ═══════════════════════════════════
+// RENDER TIMELINE (LEFT)
+// ═══════════════════════════════════
+function renderTimeline(){
+  const el=document.getElementById('daylist');el.innerHTML='';
+  DAYS.forEach((d,i)=>{
+    const km=dayKm(d.n);const kc=kmCls(km,d.n===1);
+    const div=document.createElement('div');
+    div.className='drow'+(S.openDD===d.n?' act':'');
+    div.onclick=()=>openDD(d.n);
+    div.innerHTML=`
+      <div class="dhdr">
+        <div class="ddot" style="background:${DC[i]}"></div>
+        <span class="dnum">Day ${d.n}</span>
+        <span class="ddate">${d.date}</span>
+        ${d.warn?'<span class="dwarn">⚠️</span>':''}
+      </div>
+      <div class="droute">${d.from} → ${d.to}</div>
+      <div class="dmeta"><span class="dkm ${kc}">${km.toLocaleString()}km</span> · ${d.night}</div>`;
+    el.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════
+// RENDER ATTRACTIONS (RIGHT)
+// ═══════════════════════════════════
+function renderAttrs(){
+  const el=document.getElementById('attrlist');el.innerHTML='';
+  for(let d=1;d<=10;d++){
+    const da=ATTRS.filter(a=>S.adays[a.id]===d&&!a.opt);
+    if(!da.length)continue;
+    const km=dayKm(d);const kc=kmCls(km,d===1);
+    const h=document.createElement('div');h.className='shdr';
+    h.innerHTML=`<span>Day ${d} · ${DAYS[d-1].date}</span><span class="shkm ${kc}">${km}km</span>`;
+    el.appendChild(h);
+    da.forEach(a=>el.appendChild(mkCard(a)));
+  }
+  const ob=document.createElement('div');ob.className='optbtn';
+  ob.innerHTML=`${S.showOpt?'▾':'▸'} Optional Detours — decide on the fly`;
+  ob.onclick=()=>{S.showOpt=!S.showOpt;renderAttrs();};
+  el.appendChild(ob);
+  if(S.showOpt){ATTRS.filter(a=>a.opt).forEach(a=>el.appendChild(mkCard(a)));}
+}
+
+function mkCard(a){
+  const on=S.sel.has(a.id);const dn=S.adays[a.id];const col=DC[dn-1];
+  const tl=a.t===1?'🟢 on-route':a.t===2?'🟡 peel-off':'🔴 diversion';
+  const tc=`t${a.t}`;
+  const meta=[a.vh>0?`${a.vh}hrs`:'',a.dkm>0?`+${a.dkm*2}km`:''].filter(Boolean).join(' · ');
+  const div=document.createElement('div');div.className='acard';div.id=`c-${a.id}`;
+  div.innerHTML=`
+    <div class="ar1">
+      <input type="checkbox" class="achk" id="chk-${a.id}" ${on?'checked':''} onchange="toggleA('${a.id}',this.checked)">
+      <label class="aname ${on?'':'off'}" for="chk-${a.id}">${a.name}</label>
+      <button class="dbadge" style="background:${col}" onclick="openPicker('${a.id}',event)">D${dn}</button>
+    </div>
+    <div class="ar2">
+      <span class="tb ${tc}">${tl}</span>
+      ${meta?`<span class="amet">${meta}</span>`:''}
+      <a class="alink" href="${a.link}" target="_blank" title="Wikipedia">📖</a>
+    </div>
+    <div class="adesc">${a.desc}</div>`;
+  return div;
+}
+
+// ═══════════════════════════════════
+// DAY PICKER
+// ═══════════════════════════════════
+function openPicker(id,ev){
+  ev.stopPropagation();
+  document.querySelectorAll('.dpicker').forEach(e=>e.remove());
+  const card=document.getElementById(`c-${id}`);if(!card)return;
+  const attr=ATTRS.find(a=>a.id===id);
+  const cur=S.adays[id];
+  const dp=document.createElement('div');dp.className='dpicker';
+  let html=`<div class="dptitle">Move to day:</div><div class="dpopts">`;
+  DAYS.forEach((d,i)=>{
+    const newKm=dayKm(d.n)+(d.n!==cur?attr.dkm*2:0);
+    const kc=kmCls(newKm,d.n===1);
+    const warn=kc?` ⚠️`:'';
+    html+=`<button class="dpopt${d.n===cur?' cur':''}" style="background:${DC[i]}"
+      title="Day ${d.n}: ~${newKm}km${warn}" onclick="setDay('${id}',${d.n})">D${d.n}</button>`;
+  });
+  html+=`</div><div class="dpkm">Hover a day to see km impact</div>`;
+  dp.innerHTML=html;
+  card.style.position='relative';card.appendChild(dp);
+  setTimeout(()=>{
+    document.addEventListener('click',function h(){dp.remove();document.removeEventListener('click',h);},{once:true});
+  },50);
+}
+
+// ═══════════════════════════════════
+// DAY DETAIL OVERLAY
+// ═══════════════════════════════════
+function openDD(n){
+  S.openDD=n;
+  const d=DAYS[n-1];const col=DC[n-1];const km=dayKm(n);
+  const kc=kmCls(km,n===1);
+  let h=`<div class="ddhdr" style="border-top:4px solid ${col}">
+    <div>
+      <div class="ddtitle">Day ${n} &nbsp;·&nbsp; ${d.date}</div>
+      <div class="ddsub">${d.from} → ${d.to}<br>
+        <span class="${kc?'dkm '+kc:''}">${km.toLocaleString()}km</span>
+        &nbsp;·&nbsp; Night: ${d.night}
+        ${!d.duskOk?'&nbsp;·&nbsp; <span style="color:var(--warn)">⚠️ Arrive before dark</span>':''}
+      </div>
+    </div>
+    <button class="ddx" onclick="closeDD()">✕</button>
+  </div>`;
+
+  if(d.crit){
+    h+=`<div class="crit"><div class="crittitle">⚠️ Critique &amp; Watch-outs</div>
+      <div class="crittext">${d.crit.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div></div>`;
+  }
+
+  // Schedule
+  if(d.sched.length){
+    h+=`<div class="ddsec"><div class="ddsectitle">Estimated Schedule</div>`;
+    d.sched.forEach(s=>{
+      h+=`<div class="si"><div class="stime">${s.t}</div>
+        <div class="scnt"><div class="sname">${s.n}</div>${s.s?`<div class="ssub">${s.s}</div>`:''}</div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // Active stops for this day
+  const active=ATTRS.filter(a=>S.adays[a.id]===n&&S.sel.has(a.id));
+  if(active.length){
+    h+=`<div class="ddsec"><div class="ddsectitle">Active Stops This Day</div>`;
+    active.forEach(a=>{
+      const tl=a.t===1?'🟢':a.t===2?'🟡':'🔴';
+      h+=`<div class="irow" style="margin-bottom:12px">
+        <div class="iico">${tl}</div>
+        <div class="itxt">
+          <strong style="color:#fff;font-size:13px">${a.name}</strong>
+          ${a.vh?` · ${a.vh}hrs`:''}${a.dkm?` · +${a.dkm*2}km detour`:''}<br>
+          ${a.desc}<br>
+          <a href="${a.link}" target="_blank" style="color:#6aabf0;font-size:11px">📖 Read more →</a>
+        </div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // Road + fuel notes
+  h+=`<div class="ddsec"><div class="ddsectitle">Road &amp; Fuel Notes</div>`;
+  d.road.forEach(r=>{h+=`<div class="irow"><div class="itxt">${r}</div></div>`;});
+  h+=`</div>`;
+
+  // Pre-booking
+  if(d.prebook.length){
+    h+=`<div class="ddsec"><div class="ddsectitle">Pre-Booking Required</div>`;
+    d.prebook.forEach(p=>{
+      h+=`<div class="pb2item"><span>${p.r?'🔴':'🟠'}</span>
+        <div><div class="pb2name">${p.n}</div>
+        <div class="pb2sub">${p.s}${p.u?` &nbsp;·&nbsp; <a href="${p.u}" target="_blank">${p.u.replace('https://','')}</a>`:''}</div>
+        </div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // Optional detours for this day (not selected)
+  const opts=ATTRS.filter(a=>S.adays[a.id]===n&&a.opt&&!S.sel.has(a.id));
+  if(opts.length){
+    h+=`<div class="ddsec"><div class="ddsectitle">Optional Detours — Decide on the Fly</div>`;
+    opts.forEach(a=>{
+      const tl=a.t===2?'🟡':'🔴';
+      h+=`<div class="irow" style="margin-bottom:10px">
+        <div class="iico">${tl}</div>
+        <div class="itxt">
+          <strong style="color:#fff">${a.name}</strong> &nbsp;+${a.dkm*2}km &nbsp;·&nbsp; ${a.vh}hrs<br>
+          ${a.desc}<br>
+          <a href="${a.link}" target="_blank" style="color:#6aabf0;font-size:11px">📖 Read →</a>
+          &nbsp;&nbsp;<button class="addopt" onclick="addOpt('${a.id}')">+ Add to day</button>
+        </div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  h+=`<div class="ddnav">
+    ${n>1?`<button class="ddnbtn" onclick="openDD(${n-1})">◀ Day ${n-1}</button>`:'<div></div>'}
+    ${n<10?`<button class="ddnbtn" onclick="openDD(${n+1})">Day ${n+1} ▶</button>`:'<div></div>'}
+  </div>`;
+
+  document.getElementById('ddcontent').innerHTML=h;
+  document.getElementById('dd').style.display='block';
+  document.getElementById('obk').style.display='block';
+  renderTimeline();
+}
+
+function closeDD(){
+  S.openDD=null;
+  document.getElementById('dd').style.display='none';
+  document.getElementById('obk').style.display='none';
+  renderTimeline();
+}
+
+// ═══════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════
+function toggleA(id,on){
+  on?S.sel.add(id):S.sel.delete(id);
+  S.preset=null;
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
+  render();
+}
+
+function setDay(id,n){
+  S.adays[id]=n;
+  document.querySelectorAll('.dpicker').forEach(e=>e.remove());
+  render();
+  if(S.openDD)openDD(S.openDD);
+}
+
+function addOpt(id){
+  S.sel.add(id);S.showOpt=true;
+  render();if(S.openDD)openDD(S.openDD);
+}
+
+function applyPreset(name){
+  S.sel=new Set(PRESETS[name]);
+  ATTRS.forEach(a=>{S.adays[a.id]=a.d;});
+  S.preset=name;
+  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
+  const map={'cg':'CG','mp':'MP','both':'Both'};
+  document.querySelectorAll('.pb').forEach(b=>{
+    if(b.textContent.includes(map[name])||b.textContent.includes('★'&&name==='both'))
+      b.classList.add('on');
+  });
+  // fix preset button highlight
+  const btns=document.querySelectorAll('.pb');
+  btns.forEach(b=>b.classList.remove('on'));
+  if(name==='cg')btns[0].classList.add('on');
+  else if(name==='mp')btns[1].classList.add('on');
+  else btns[2].classList.add('on');
+  render();
+}
+
+function renderStats(){
+  const t=totalKm();
+  document.getElementById('statkm').textContent=t.toLocaleString();
+  document.getElementById('statadd').textContent=Math.round(t/10);
+}
+
+function render(){
+  renderStats();renderTimeline();renderAttrs();renderMap();
+}
+
+// Mobile tabs
+function mobTab(tab,el){
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  ['lp','rp'].forEach(id=>{document.getElementById(id).style.display='none';});
+  closeDD();
+  if(tab==='days'){
+    const lp=document.getElementById('lp');
+    lp.style.display='block';lp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
+  }else if(tab==='attr'){
+    const rp=document.getElementById('rp');
+    rp.style.display='block';rp.style.cssText='display:block;position:fixed;inset:56px 0 50px;width:100%;z-index:150;overflow-y:auto;background:var(--sur)';
+  }
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initMap();render();
+  window.addEventListener('resize',()=>S.map.invalidateSize());
+  if(window.innerWidth<768)document.getElementById('mobnav').style.display='flex';
+});
+</script>
+</body>
+</html>
